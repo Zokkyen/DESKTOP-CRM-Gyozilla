@@ -1,3 +1,5 @@
+import './App.css';
+import RouteConfig from 'routes';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { Button, Card, ThemeProvider } from '@mui/material';
 import icon from '../../assets/icon.svg';
@@ -7,13 +9,13 @@ import 'primeicons/primeicons.css';
 import './App.css';
 import defaultTheme from './utils/theming/theme';
 import CustomDrawer from './components/CustomDrawer';
-import './App.css';
-import RouteConfig from 'routes';
 
 export default function App() {
   return (
-    <Router>
-      <RouteConfig />
-    </Router>
+    <ThemeProvider theme={defaultTheme}>
+      <Router>
+        <RouteConfig />
+      </Router>
+    </ThemeProvider>
   );
 }
