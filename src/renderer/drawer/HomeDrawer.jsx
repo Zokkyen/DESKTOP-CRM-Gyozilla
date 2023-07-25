@@ -3,7 +3,6 @@ import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
@@ -28,12 +27,11 @@ import arrayNavigation from 'renderer/drawerNavigation';
 import Main from 'component/Main';
 import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
+import { Link } from '@mui/material';
 
 const drawerWidth = 240;
 
-
 const HomeDrawer = () => {
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -55,16 +53,28 @@ const HomeDrawer = () => {
   };
 
   const [selectedItem, setSelectedItem] = React.useState(arrayNavigation[0]);
+  const [mainContent, setMainContent] = React.useState(null); // État pour suivre le contenu du MAIN
+
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
+    setMainContent(null);
+  };
+
+  const handleComponentLinkClick = (component) => {
+    setMainContent(component);
+  };
+
+    // Fonction callback qui renverra handleComponentLinkClick
+    const callback = (component) => {
+      handleComponentLinkClick(component);
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar style={{backgroundColor: '#212830', color :"#FFF"}} position="fixed" open={open} drawerWidth={drawerWidth}>
-        <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
+      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -74,75 +84,87 @@ const HomeDrawer = () => {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{width: '80px'}} src={icon} alt="Logo" />
+          <Link href="/home" underline='none'>
+            <img style={{width: '80px'}} src={icon} alt="Logo" />
+          </Link>
+          
           <Button
-            style={{color: 'white', backgroundColor: '#212830'}}
+            style={{ color: 'white', backgroundColor: '#212830' }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={openMenu ? 'true' : undefined}
             onClick={handleClick}
           >
-          Levert M-A <KeyboardArrowDownIcon/>
-        </Button>
-      <Menu
-      style={{color: '#212830'}}
-        id="demo-positioned-menu"
-        aria-labelledby="demo-positioned-button"
-        anchorEl={anchorEl}
-        open={openMenu}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
-      </Menu>
+            Levert M-A <KeyboardArrowDownIcon />
+          </Button>
+          <Menu
+            style={{ color: '#212830' }}
+            id="demo-positioned-menu"
+            aria-labelledby="demo-positioned-button"
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
-      <Drawer 
+      <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            backgroundColor: "#212830",
           },
         }}
         variant="persistent"
         anchor="left"
         open={open}
       >
-        <DrawerHeader style={{backgroundColor: '#212830'}}>
-          <IconButton style={{ color: '#FFFF'}} onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'ltr' ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
           </IconButton>
         </DrawerHeader>
-        <List style={{backgroundColor: '#212830', color: '#FFFF'}}>
+        <List>
           {arrayNavigation.map((item, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton style={{backgroundColor: item === selectedItem ? '#f6a400' : '#212830'}} onClick={() => handleItemClick(item)}>
-                <ListItemIcon style={{ color: '#FFFF'}}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
+            <ListItem
+              key={index}
+              disablePadding
+              className={item === selectedItem ? 'active' : null}
+            >
+              <ListItemButton onClick={() => handleItemClick(item)}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText
+                  className={item === selectedItem ? 'barre' : null}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
       </Drawer>
       <Main open={open} drawerWidth={drawerWidth}>
-        {selectedItem.component}
+        {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
+        {mainContent ? mainContent : selectedItem.component.callback({ callback })}
       </Main>
     </Box>
   );
-}
+};
 
-export default HomeDrawer
+export default HomeDrawer;

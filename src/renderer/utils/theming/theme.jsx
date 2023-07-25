@@ -27,29 +27,24 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            color: 'red',
+            '& .MuiTypography-root': {
+              color: '#ffffff', // Change the text color on hover.
+            },
+            '& .MuiSvgIcon-root': {
+              color: '#ffffff', // Change the text color on hover.
+            },
             backgroundColor: '#f6a400',
           },
           '&.active': {
-            backgroundColor: 'yellow',
-            borderRight: '5px solid red',
-            color: 'red',
-            '&:hover': {
-              backgroundColor: 'green', // Optionnel, définissez la couleur souhaitée pour le hover des éléments actifs
-            },
+            color: '#f6a400',
+            borderRight: '5px solid #f6a400',
           },
-        },
-        selected: {
-          backgroundColor: '#212830',
-          color: '#f6a400',
-        },
-      },
-    },
-
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: '#212830',
+          '&.active svg': {
+            color: '#f6a400',
+          },
+          '&.active span': {
+            color: '#f6a400',
+          },
         },
       },
     },
@@ -67,6 +62,26 @@ const theme = createTheme({
       },
     },
 
+    //        Style du drawer       //
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#212830',
+        },
+      },
+    },
+
+    //        Style AppBar        //
+
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#212830',
+          color: '#FFF',
+        },
+      },
+    },
+
     //        Style des boutons        //
     MuiButton: {
       styleOverrides: {
@@ -75,27 +90,22 @@ const theme = createTheme({
           backgroundColor: '#4c6e65',
           fontSize: '1.0rem',
           fontWeight: 'bold',
-          // marginTop: "3vh",
-          '&:hover': {
-            color: '#EAEAEA',
-            backgroundColor: '#f6a400',
-          },
         },
         outlined: {
-          color: '#F8A500',
+          color: '#f6a400',
           backgroundColor: '#EAEAEA',
-          border: '1px solid #F8A500',
+          border: '1px solid #f6a400',
           marginTop: '3vh',
         },
         contained: {
           color: '#EAEAEA',
-          backgroundColor: '#F8A500',
+          backgroundColor: '#f6a400',
           border: '1px solid #EAEAEA',
           marginTop: '3vh',
           '&:hover': {
-            color: '#F8A500',
+            color: '#f6a400',
             backgroundColor: '#EAEAEA',
-            border: '1px solid #F8A500',
+            border: '1px solid #f6a400',
           },
         },
         annule: {
@@ -122,10 +132,10 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#F8A500',
+      main: '#f6a400',
     },
     title: {
-      main: '#F8A500',
+      main: '#f6a400',
     },
     secondary: {
       main: '#5F8D85',
@@ -141,14 +151,14 @@ const theme = createTheme({
   typography: {
     fontFamily: 'Garamond',
     h5: {
-      color: '#F8A500',
+      color: '#f6a400',
       fontSize: '4rem',
       fontFamily: 'Garamond',
       fontWeight: 'bold',
       marginBottom: '10px',
     },
     h6: {
-      color: '#F8A500',
+      color: '#f6a400',
       fontSize: '2.5rem',
       fontFamily: 'Garamond',
       fontWeight: 'bold',
@@ -169,7 +179,7 @@ const theme = createTheme({
       marginBottom: '10px',
     },
     hbox: {
-      color: '#F8A500',
+      color: '#f6a400',
       fontSize: '1.5rem',
       fontFamily: 'Garamond',
       fontWeight: 'bold',
@@ -192,7 +202,7 @@ const theme = createTheme({
       fontWeight: 'bold',
     },
     h7: {
-      color: '#F8A500',
+      color: '#f6a400',
       fontSize: '1.2rem',
       fontFamily: 'Garamond',
       fontWeight: 'bold',
