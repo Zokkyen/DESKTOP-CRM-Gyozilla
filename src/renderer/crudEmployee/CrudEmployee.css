@@ -1,0 +1,19 @@
+.dashboard {
+    font-family: Arial, sans-serif;
+    width: 100%;
+}
+
+.dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dashboard th, .dashboard td {
+    border: 1px solid #000;
+    padding: 10px;
+    text-align: left;
+}
+
+.dashboard #add-employee {
+    margin-top: 20px;
+}

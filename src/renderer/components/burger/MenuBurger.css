@@ -1,0 +1,12 @@
+.link-hover {
+    padding: 16px 0 16px 30px; 
+}
+
+.link-hover:hover {
+    background-color: #F8A500;
+    color: white;
+}
+
+.link-hover:hover span {
+    color: white;
+}
