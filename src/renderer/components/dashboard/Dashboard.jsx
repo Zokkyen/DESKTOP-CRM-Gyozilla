@@ -3,13 +3,13 @@ import './Dashboard.css';
 import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
 import { addEmployee } from 'renderer/utils/api-call/addEmployee';
 import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
+import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
 
 export default function Dashboard() {
   //Récupération des employés----------------
   const [employees, setEmployees] = useState([]);
   useEffect(() => {
     getAllEmployees().then((data) => {
-      console.log(data.data);
       setEmployees(data.data);
     });
   }, []);
@@ -33,7 +33,9 @@ export default function Dashboard() {
   //Mise à jour d'un employé--------------------
   const handleUpdateEmployee = (id) => {
     const updatedEmployee = {
-      lastname: 'Smith',
+      lastname: 'Tara',
+      firstname: 'Dave',
+      phone: '0909090909',
     };
 
     updateEmployee(id, updatedEmployee).then(() => {
@@ -64,16 +66,28 @@ export default function Dashboard() {
             <th>Prénom</th>
             <th>Numéro</th>
             <th>Id</th>
+            <th> Modification </th>
+            <th> Suppression </th>
           </tr>
         </thead>
         <tbody>
           {employees.map((item) => {
             return (
-              <tr>
+              <tr key={item.id}>
                 <td>{item.lastname}</td>
                 <td>{item.firstname}</td>
                 <td>{item.phone}</td>
                 <td>{item.id}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      handleUpdateEmployee(item.id);
+                      console.log('update!');
+                    }}
+                  >
+                    Modifier
+                  </button>
+                </td>
                 <td>
                   <button onClick={() => handleDeleteEmployee(item.id)}>
                     Supprimer
@@ -84,21 +98,15 @@ export default function Dashboard() {
           })}
         </tbody>
       </table>
-      <button id="add-employee" onClick={handleAddEmployee}>
+      <button
+        id="add-employee"
+        onClick={() => {
+          handleAddEmployee();
+          console.log('create!');
+        }}
+      >
         Ajouter un employé
       </button>
-
-      <tbody>
-        {employees.map((item) => {
-          return (
-            <tr>
-              <td onClick={() => handleUpdateEmployee(item.id)}>
-                {item.lastname}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
     </div>
   );
 }
