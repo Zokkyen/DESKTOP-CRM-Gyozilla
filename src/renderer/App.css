@@ -6,12 +6,13 @@ body {
   position: relative;
   color: white;
   height: 100vh;
-  background: linear-gradient(
+  /* background: linear-gradient(
     200.96deg,
-    #5F8D85 -29.09%,
-    #5F8D85 51.77%,
-    #5F8D85 129.35%
-  );
+    #fedc2a -29.09%,
+    #dd5789 51.77%,
+    #7a2c9e 129.35%
+  ); */
+  background: white;
   font-family: sans-serif;
   overflow-y: hidden;
   display: flex;

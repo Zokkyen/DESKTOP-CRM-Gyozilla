@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './Dashboard.css';
-import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
-import { addEmployee } from 'renderer/utils/api-call/addEmployee';
-import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
-import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
+import './CrudEmployee.css';
+import { getAllEmployees } from '../utils/api-call/getAllEmployees';
+import { addEmployee } from '../utils/api-call/addEmployee';
+import { updateEmployee } from '../utils/api-call/updateEmployee';
+import { deleteEmployee } from '../utils/api-call/deleteEmployee';
 
-export default function Dashboard() {
+export default function CrudEmployee() {
   //Récupération des employés----------------
   const [employees, setEmployees] = useState([]);
   useEffect(() => {
