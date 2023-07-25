@@ -3,7 +3,6 @@ import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
@@ -28,6 +27,7 @@ import arrayNavigation from 'renderer/drawerNavigation';
 import Main from 'component/Main';
 import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
+import { Link } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -55,9 +55,21 @@ const HomeDrawer = () => {
   };
 
   const [selectedItem, setSelectedItem] = React.useState(arrayNavigation[0]);
+  const [mainContent, setMainContent] = React.useState(null); // État pour suivre le contenu du MAIN
+
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
+    setMainContent(null);
+  };
+
+  const handleComponentLinkClick = (component) => {
+    setMainContent(component);
+  };
+
+    // Fonction callback qui renverra handleComponentLinkClick
+    const callback = (component) => {
+      handleComponentLinkClick(component);
   };
 
   return (
@@ -74,7 +86,10 @@ const HomeDrawer = () => {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{width: '80px'}} src={icon} alt="Logo" />
+          <Link href="/home" underline='none'>
+            <img style={{width: '80px'}} src={icon} alt="Logo" />
+          </Link>
+          
           <Button
             style={{color: 'white', backgroundColor: '#212830'}}
             id="demo-positioned-button"
@@ -139,7 +154,8 @@ const HomeDrawer = () => {
         </List>
       </Drawer>
       <Main open={open} drawerWidth={drawerWidth}>
-        {selectedItem.component}
+        {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
+        {mainContent ? mainContent : selectedItem.component.callback({ callback })}
       </Main>
     </Box>
   );

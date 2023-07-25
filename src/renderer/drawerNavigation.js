@@ -5,22 +5,28 @@ import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import CrudStock from './crudStock/CrudStock';
 import Home from './home/Home';
 
-const arrayNavigation = [
-    {
-        label: 'Accueil',
-        icon: <HomeIcon/>,
-        component: <Home/>,
-    },
-    {
-        label: 'Produits',
-        icon: <RamenDiningIcon/>,
-        component: <CrudProducts/>,
-    },
-    {
-        label: 'Stock',
-        icon: <InventoryIcon/>,
-        component: <CrudStock/>,
-    },
-]
+    const arrayNavigation = [
+        {
+            label: 'Accueil',
+            icon: <HomeIcon />,
+            component: {
+                callback: ({ callback }) => <Home onLinkClick={callback} />,
+            },
+        },
+        {
+            label: 'Produits',
+            icon: <RamenDiningIcon />,
+            component: {
+                callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
+            },
+        },
+        {
+            label: 'Stock',
+            icon: <InventoryIcon />,
+            component: {
+                callback: ({ callback }) => <CrudStock onLinkClick={callback} />,
+            },
+        },
+    ];
 
 export default arrayNavigation;
