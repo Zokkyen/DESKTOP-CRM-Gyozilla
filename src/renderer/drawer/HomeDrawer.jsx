@@ -31,9 +31,7 @@ import DrawerHeader from 'component/DrawerHeader';
 
 const drawerWidth = 240;
 
-
 const HomeDrawer = () => {
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -63,8 +61,8 @@ const HomeDrawer = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar style={{backgroundColor: '#212830', color :"#FFF"}} position="fixed" open={open} drawerWidth={drawerWidth}>
-        <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
+      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -74,65 +72,73 @@ const HomeDrawer = () => {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{width: '80px'}} src={icon} alt="Logo" />
+          <img style={{ width: '80px' }} src={icon} alt="Logo" />
           <Button
-            style={{color: 'white', backgroundColor: '#212830'}}
+            style={{ color: 'white', backgroundColor: '#212830' }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={openMenu ? 'true' : undefined}
             onClick={handleClick}
           >
-          Levert M-A <KeyboardArrowDownIcon/>
-        </Button>
-      <Menu
-      style={{color: '#212830'}}
-        id="demo-positioned-menu"
-        aria-labelledby="demo-positioned-button"
-        anchorEl={anchorEl}
-        open={openMenu}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
-      </Menu>
+            Levert M-A <KeyboardArrowDownIcon />
+          </Button>
+          <Menu
+            style={{ color: '#212830' }}
+            id="demo-positioned-menu"
+            aria-labelledby="demo-positioned-button"
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
-      <Drawer 
+      <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            backgroundColor: "#212830",
           },
         }}
         variant="persistent"
         anchor="left"
         open={open}
       >
-        <DrawerHeader style={{backgroundColor: '#212830'}}>
-          <IconButton style={{ color: '#FFFF'}} onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'ltr' ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
           </IconButton>
         </DrawerHeader>
-        <List style={{backgroundColor: '#212830', color: '#FFFF'}}>
+        <List>
           {arrayNavigation.map((item, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton style={{backgroundColor: item === selectedItem ? '#f6a400' : '#212830'}} onClick={() => handleItemClick(item)}>
-                <ListItemIcon style={{ color: '#FFFF'}}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
+            <ListItem
+              key={index}
+              disablePadding
+              className={item === selectedItem ? 'active' : null}
+            >
+              <ListItemButton onClick={() => handleItemClick(item)}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText
+                  className={item === selectedItem ? 'barre' : null}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -143,6 +149,6 @@ const HomeDrawer = () => {
       </Main>
     </Box>
   );
-}
+};
 
-export default HomeDrawer
+export default HomeDrawer;
