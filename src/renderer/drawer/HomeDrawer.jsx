@@ -23,7 +23,7 @@ import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
 import { useNavigate } from 'react-router-dom';
 import icon from '../../../assets/icon.png';
-import { UserContext } from '../utils/UserContext';
+import { UserContext } from '../utils/context/UserContext';
 
 const drawerWidth = 240;
 

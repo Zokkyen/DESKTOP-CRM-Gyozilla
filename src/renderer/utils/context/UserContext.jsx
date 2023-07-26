@@ -23,5 +23,5 @@ export function UserProvider({ children }) {
 
   const value = useMemo(() => ({ user, logIn, logOut }), [user, logIn, logOut]);
 
-  return <UserContext.Provider value={value}>){children}</UserContext.Provider>;
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

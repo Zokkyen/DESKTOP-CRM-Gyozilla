@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import CrudProducts from './renderer/crudProducts/CrudProducts';
 import HomeDrawer from './renderer/drawer/HomeDrawer';
 import Login from './renderer/login/Login';
-import { UserContext } from './renderer/utils/UserContext';
+import { UserContext } from './renderer/utils/context/UserContext';
 
 function RouteConfig() {
   const { user } = useContext(UserContext);
