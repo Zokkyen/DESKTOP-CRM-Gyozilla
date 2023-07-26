@@ -19,7 +19,13 @@ export function UserProvider({ children }) {
     const token = localStorage.getItem('token');
     if (token) {
       const decoded = jwt_decode(token);
-      setUser(decoded);
+      const currentTime = Date.now().valueOf() / 1000;
+      if (decoded.exp > currentTime) {
+        setUser(decoded);
+      } else {
+        // Le token a expiré
+        localStorage.removeItem('token');
+      }
     }
     setLoading(false);
   }, []);

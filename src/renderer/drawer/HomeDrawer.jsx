@@ -145,7 +145,7 @@ export default function HomeDrawer() {
         <List>
           {arrayNavigation.map((item) => (
             <ListItem
-              key={item.id}
+              key={`item${Math.random(3)}`}
               disablePadding
               className={item === selectedItem ? 'active' : null}
             >
@@ -159,7 +159,7 @@ export default function HomeDrawer() {
           ))}
         </List>
       </Drawer>
-      <Main open={open} drawerWidth={drawerWidth}>
+      <Main open={open}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
         {mainContent || selectedItem.component.callback({ callback })}
       </Main>
