@@ -6,6 +6,7 @@ import moment from 'moment';
 
 // Composant pour afficher une "card" d'order
 const OrderCard = ({ order }) => {
+  console.log('order', order);
   const getOrderTypeLabel = (orderTypeId) => {
     console.log('orderTypeId', orderTypeId);
     switch (orderTypeId) {
@@ -20,6 +21,21 @@ const OrderCard = ({ order }) => {
     }
   };
 
+  const getOrderStatusLabel = (orderStatusId) => {
+    switch (orderStatusId) {
+      case 1:
+        return 'En cours de préparation';
+      case 2:
+        return 'Paiement en attente';
+      case 3:
+        return 'Livrée';
+      case 4:
+        return 'Préparée';
+      default:
+        return 'Status non renseigné';
+    }
+  };
+
   const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
   const formattedHour = moment(order.date_order).format('HH:mm');
 
@@ -28,9 +44,9 @@ const OrderCard = ({ order }) => {
       <CardContent>
         <Typography>Date : {formattedDate}</Typography>
         <Typography>Heure : {formattedHour}</Typography>
-        <Typography>Status : {order.status}</Typography>
+        <Typography>Status : {getOrderStatusLabel(order.id_status)}</Typography>
         <Typography>
-          Order Type : {getOrderTypeLabel(order.id_order_type)}
+          Order Type : {getOrderTypeLabel(order.id_order_types)}
         </Typography>
         <Typography>Prix : {order.total_price}€</Typography>
       </CardContent>
