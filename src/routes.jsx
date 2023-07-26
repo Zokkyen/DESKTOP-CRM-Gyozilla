@@ -20,10 +20,6 @@ function RouteConfig() {
       protected: true,
     },
     {
-      path: '/home',
-      element: <Home />,
-    },
-    {
       path: '/products',
       component: CrudProducts,
       protected: true,

@@ -25,7 +25,7 @@ function OrderCard({ order }) {
       case 1:
         return 'Paiement en attente';
       case 2:
-        return 'Payée';
+        return 'A preparer';
       case 3:
         return 'En cours de préparation';
       case 4:
@@ -36,8 +36,6 @@ function OrderCard({ order }) {
         return 'Status non renseigné';
     }
   };
-
-  const get
 
   const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
   const formattedHour = moment(order.date_order).format('HH:mm');
