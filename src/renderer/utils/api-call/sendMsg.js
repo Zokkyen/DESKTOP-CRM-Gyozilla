@@ -1,5 +1,5 @@
-import instance from '../interceptor'
+import instance from '../interceptor';
 
 export const sendMsg = async (values) => {
-  return await instance.post('messages', values)
-}
+  return await instance.post('messages', values);
+};

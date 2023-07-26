@@ -1,5 +1,5 @@
-import instance from "../interceptor";
+import instance from '../interceptor';
 
 export const getAllFranchises = () => {
-    return instance.get("franchises");
-}
+  return instance.get('franchises');
+};

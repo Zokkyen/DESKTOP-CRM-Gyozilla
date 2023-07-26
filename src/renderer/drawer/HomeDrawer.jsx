@@ -75,12 +75,7 @@ function HomeDrawer() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar
-        style={{ backgroundColor: '#212830', color: '#FFF' }}
-        position="fixed"
-        open={open}
-        drawerWidth={drawerWidth}
-      >
+      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
@@ -138,8 +133,8 @@ function HomeDrawer() {
         anchor="left"
         open={open}
       >
-        <DrawerHeader style={{ backgroundColor: '#212830' }}>
-          <IconButton style={{ color: '#FFFF' }} onClick={handleDrawerClose}>
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
             ) : (
@@ -147,16 +142,14 @@ function HomeDrawer() {
             )}
           </IconButton>
         </DrawerHeader>
-        <List style={{ backgroundColor: '#212830', color: '#FFFF' }}>
+        <List>
           {arrayNavigation.map((item) => (
-            <ListItem key={item.id} disablePadding>
-              <ListItemButton
-                style={{
-                  backgroundColor:
-                    item === selectedItem ? '#f6a400' : '#212830',
-                }}
-                onClick={() => handleItemClick(item)}
-              >
+            <ListItem
+              key={item.id}
+              disablePadding
+              className={item === selectedItem ? 'active' : null}
+            >
+              <ListItemButton onClick={() => handleItemClick(item)}>
                 <ListItemIcon style={{ color: '#FFFF' }}>
                   {item.icon}
                 </ListItemIcon>

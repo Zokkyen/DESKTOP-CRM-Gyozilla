@@ -1,5 +1,5 @@
-import instance from '../interceptor'
+import instance from '../interceptor';
 
 export const getAllNews = () => {
-  return instance.get('news')
-}
+  return instance.get('news');
+};

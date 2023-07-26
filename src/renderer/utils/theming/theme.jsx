@@ -91,6 +91,11 @@ const theme = createTheme({
           backgroundColor: '#4c6e65',
           fontSize: '1.0rem',
           fontWeight: 'bold',
+          '&:hover': {
+            color: '#EAEAEA',
+            backgroundColor: '#f6a400',
+            border: '1px solid #f6a400',
+          },
         },
         outlined: {
           color: '#f6a400',
