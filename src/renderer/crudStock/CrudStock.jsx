@@ -13,8 +13,8 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
-import { getAllIngedients } from 'utils/api-calls/getAllIngredients';
 import { Badge } from 'primereact/badge';
+import { getAllIngredients } from 'renderer/utils/api-call/getAllIngredients';
 
 const CrudStock = () => {
   let emptyIngredients = {
@@ -34,12 +34,12 @@ const [globalFilter, setGlobalFilter] = useState(null);
 const toast = useRef(null);
 const dt = useRef(null);
 
-useEffect(()=>{
-  getAllIngedients()
-  .then((res)=>{
+// useEffect(()=>{
+//   getAllIngredients()
+//   .then((res)=>{
     
-  })
-})
+//   })
+// })
 
 
 const formatCurrency = (value) => {
