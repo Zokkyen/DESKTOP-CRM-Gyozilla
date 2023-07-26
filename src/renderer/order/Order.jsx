@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // Import des dépendances nécessaires
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
@@ -5,7 +6,7 @@ import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByF
 import moment from 'moment';
 
 // Composant pour afficher une "card" d'order
-const OrderCard = ({ order }) => {
+function OrderCard({ order }) {
   const getOrderTypeLabel = (orderTypeId) => {
     switch (orderTypeId) {
       case 1:
@@ -54,14 +55,14 @@ const OrderCard = ({ order }) => {
       </CardContent>
     </Card>
   );
-};
+}
 
-const OrdersPage = () => {
+function OrdersPage() {
   // État pour stocker les données des orders
   const [ordersData, setOrdersData] = useState([]);
   console.log('ordersData', ordersData);
 
-  //Récupère les orders depuis la base de données
+  // Récupère les orders depuis la base de données
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
@@ -77,7 +78,7 @@ const OrdersPage = () => {
     fetchOrdersData();
   }, []);
 
-  //Calcule le nombre de commandes en cours
+  // Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(
     (order) => order.id_status === 2
   ).length;
@@ -100,6 +101,6 @@ const OrdersPage = () => {
       </Grid>
     </div>
   );
-};
+}
 
 export default OrdersPage;

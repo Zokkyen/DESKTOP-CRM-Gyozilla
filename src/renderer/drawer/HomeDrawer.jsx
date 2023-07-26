@@ -161,9 +161,7 @@ function HomeDrawer() {
       </Drawer>
       <Main open={open} drawerWidth={drawerWidth}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
-        {mainContent
-          ? mainContent
-          : selectedItem.component.callback({ callback })}
+        {mainContent || selectedItem.component.callback({ callback })}
       </Main>
     </Box>
   );
