@@ -1,0 +1,72 @@
+.backgroundHome img:first-of-type {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.backgroundHome {
+  height: calc(100vh - 71px);
+  margin-bottom: 100px;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.logoEcriture {
+  width: 40vw;
+  position: absolute;
+  right: 18vw;
+  bottom: 25vh;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+@media (max-width: 700px) {
+  .logoEcriture {
+    width: 20rem;
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -40%);
+  }
+
+  .backgroundHome {
+    height: calc(100vh - 56px);
+  }
+
+  .gridContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: scroll !important;
+    white-space: "nowrap";
+  }
+
+  .logoEcriture {
+    background-color: #5F8D8590;
+    border-radius: 50px;
+  }
+}
+
+@keyframes move-up-down {
+
+  0%,
+  100% {
+    transform: translateY(-20%);
+  }
+
+  50% {
+    transform: translateY(20%);
+  }
+}
+
+.move-up-down {
+  animation: move-up-down 1s ease-in-out infinite;
+}
+
+.zoomEffect {
+  transition: transform 0.5s ease-in-out;
+}
+
+.zoomEffect:hover {
+  transform: scale(1.03);
+}
