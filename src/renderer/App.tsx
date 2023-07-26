@@ -7,7 +7,7 @@ import 'primeicons/primeicons.css';
 import './App.css';
 import defaultTheme from './utils/theming/theme';
 import RouteConfig from '../routes';
-import { UserProvider } from './utils/UserContext';
+import { UserProvider } from './utils/context/UserContext';
 
 export default function App() {
   return (

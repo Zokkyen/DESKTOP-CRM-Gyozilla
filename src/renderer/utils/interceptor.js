@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Création d'une instance Axios
 const instance = axios.create({
   baseURL: 'https://api.gyozilla-restaurants.fr/api/',
   timeout: 5000,

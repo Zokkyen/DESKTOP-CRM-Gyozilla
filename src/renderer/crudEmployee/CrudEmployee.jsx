@@ -121,7 +121,7 @@ import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
 import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
 import { Button } from '@mui/material';
 
-export default function SizeDemo() {
+export default function CrudEmployee() {
   const [employees, setEmployees] = useState([]);
   const [reload, setReload] = useState(false);
   useEffect(() => {

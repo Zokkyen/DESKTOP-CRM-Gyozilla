@@ -23,11 +23,11 @@ import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
 import { useNavigate } from 'react-router-dom';
 import icon from '../../../assets/icon.png';
-import { UserContext } from '../utils/UserContext';
+import { UserContext } from '../utils/context/UserContext';
 
 const drawerWidth = 240;
 
-function HomeDrawer() {
+export default function HomeDrawer() {
   const { user, logOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -75,12 +75,7 @@ function HomeDrawer() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar
-        style={{ backgroundColor: '#212830', color: '#FFF' }}
-        position="fixed"
-        open={open}
-        drawerWidth={drawerWidth}
-      >
+      <AppBar position="fixed">
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
@@ -138,8 +133,8 @@ function HomeDrawer() {
         anchor="left"
         open={open}
       >
-        <DrawerHeader style={{ backgroundColor: '#212830' }}>
-          <IconButton style={{ color: '#FFFF' }} onClick={handleDrawerClose}>
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
             ) : (
@@ -147,16 +142,14 @@ function HomeDrawer() {
             )}
           </IconButton>
         </DrawerHeader>
-        <List style={{ backgroundColor: '#212830', color: '#FFFF' }}>
+        <List>
           {arrayNavigation.map((item) => (
-            <ListItem key={item.id} disablePadding>
-              <ListItemButton
-                style={{
-                  backgroundColor:
-                    item === selectedItem ? '#f6a400' : '#212830',
-                }}
-                onClick={() => handleItemClick(item)}
-              >
+            <ListItem
+              key={item.id}
+              disablePadding
+              className={item === selectedItem ? 'active' : null}
+            >
+              <ListItemButton onClick={() => handleItemClick(item)}>
                 <ListItemIcon style={{ color: '#FFFF' }}>
                   {item.icon}
                 </ListItemIcon>
@@ -168,12 +161,8 @@ function HomeDrawer() {
       </Drawer>
       <Main open={open} drawerWidth={drawerWidth}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
-        {mainContent
-          ? mainContent
-          : selectedItem.component.callback({ callback })}
+        {mainContent || selectedItem.component.callback({ callback })}
       </Main>
     </Box>
   );
 }
-
-export default HomeDrawer;

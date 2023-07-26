@@ -1,43 +1,39 @@
-import { useContext } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import CrudProducts from './renderer/crudProducts/CrudProducts';
+import CrudProducts from 'renderer/crudProducts/CrudProducts';
+import { useContext, useEffect } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import HomeDrawer from './renderer/drawer/HomeDrawer';
 import Login from './renderer/login/Login';
-import { UserContext } from './renderer/utils/UserContext';
+import { UserContext } from './renderer/utils/context/UserContext';
 
-function RouteConfig() {
-  const { user } = useContext(UserContext);
+export default function RouteConfig() {
+  const { user, loading } = useContext(UserContext);
+  const navigate = useNavigate();
 
-  const routes = [
-    {
-      path: '/',
-      component: Login,
-    },
-    {
-      path: '/home',
-      component: HomeDrawer,
-      protected: true,
-    },
-    {
-      path: '/products',
-      component: CrudProducts,
-      protected: true,
-    },
-  ];
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        navigate('/home');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user, navigate, loading]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Routes>
-      {routes.map((route) => {
-        let element;
-        if (route.protected) {
-          element = user ? <route.component /> : <Navigate to="/" />;
-        } else {
-          element = <route.component />;
-        }
-        return <Route key={route.path} path={route.path} element={element} />;
-      })}
+      <Route path="/" element={<Login />} />
+      <Route
+        path="/home"
+        element={user ? <HomeDrawer /> : <Navigate to="/" />}
+      />
+      <Route
+        path="/products"
+        element={user ? <CrudProducts /> : <Navigate to="/" />}
+      />
     </Routes>
   );
 }
-
-export default RouteConfig;

@@ -1,0 +1,10 @@
+.orders-container {
+  overflow: scroll; /* Ajoutez cette propriété pour activer le scroll */
+  max-height: calc(
+    100vh - 100px
+  ); /* Ajustez cette valeur selon la hauteur souhaitée */
+  margin-top: 100px;
+}
+.orders-container::-webkit-scrollbar {
+  display: none;
+}
