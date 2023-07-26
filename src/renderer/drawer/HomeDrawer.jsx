@@ -27,7 +27,7 @@ import { UserContext } from '../utils/context/UserContext';
 
 const drawerWidth = 240;
 
-function HomeDrawer() {
+export default function HomeDrawer() {
   const { user, logOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -75,7 +75,7 @@ function HomeDrawer() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
+      <AppBar position="fixed">
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
@@ -166,5 +166,3 @@ function HomeDrawer() {
     </Box>
   );
 }
-
-export default HomeDrawer;
