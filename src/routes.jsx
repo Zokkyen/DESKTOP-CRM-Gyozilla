@@ -1,5 +1,3 @@
-import { RamenDining } from '@mui/icons-material';
-import HomeIcon from '@mui/icons-material/Home';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import Home from 'renderer/home/Home';
 import { useContext } from 'react';

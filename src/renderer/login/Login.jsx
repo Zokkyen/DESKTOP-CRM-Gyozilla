@@ -5,7 +5,7 @@ import { Container, TextField, Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../utils/context/UserContext';
-import instance from '../utils/Interceptor';
+import instance from '../utils/interceptor';
 import GyozillaLogo from '../../images/logoHeader.png';
 
 export default function Login() {
