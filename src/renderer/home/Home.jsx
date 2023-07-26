@@ -15,6 +15,7 @@ import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import CrudStock from 'renderer/crudStock/CrudStock';
 import CrudEmployee from 'renderer/crudEmployee/CrudEmployee';
 import OrdersPage from 'renderer/order/Order';
+import './Home.css';
 
 const Home = ({ onLinkClick }) => {
   const handleLinkClick = (component) => {
@@ -22,7 +23,7 @@ const Home = ({ onLinkClick }) => {
   };
 
   return (
-    <Box sx={{ width: '80vw' }}>
+    <Box sx={{ width: '80vw' }} className="orders-container">
       <Grid container rowSpacing={3} columnSpacing={3}>
         <Grid item xs={6}>
           <Link
