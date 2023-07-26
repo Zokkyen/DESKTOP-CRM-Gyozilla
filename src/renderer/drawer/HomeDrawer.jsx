@@ -86,9 +86,17 @@ export default function HomeDrawer() {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{ width: '80px' }} src={icon} alt="Logo" />
+          <img
+            style={{ width: '80px', display: open ? 'none' : 'block' }}
+            src={icon}
+            alt="Logo"
+          />
           <Button
-            style={{ color: 'white', backgroundColor: '#212830' }}
+            style={{
+              color: 'white',
+              backgroundColor: '#212830',
+              display: open ? 'none' : 'block',
+            }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
             aria-haspopup="true"
@@ -98,6 +106,7 @@ export default function HomeDrawer() {
             {user.lastname} {user.firstname}
             <KeyboardArrowDownIcon />
           </Button>
+
           <Menu
             style={{ color: '#212830' }}
             id="demo-positioned-menu"
