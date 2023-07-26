@@ -1,112 +1,240 @@
-import React, { useEffect, useState } from 'react';
-import './CrudEmployee.css';
-import { getAllEmployees } from '../utils/api-call/getAllEmployees';
-import { addEmployee } from '../utils/api-call/addEmployee';
-import { updateEmployee } from '../utils/api-call/updateEmployee';
-import { deleteEmployee } from '../utils/api-call/deleteEmployee';
+// import React, { useEffect, useState } from 'react';
+// import './CrudEmployee.css';
+// import { getAllEmployees } from '../utils/api-call/getAllEmployees';
+// import { addEmployee } from '../utils/api-call/addEmployee';
+// import { updateEmployee } from '../utils/api-call/updateEmployee';
+// import { deleteEmployee } from '../utils/api-call/deleteEmployee';
 
-export default function CrudEmployee() {
-  //Récupération des employés----------------
+// export default function CrudEmployee() {
+//   //Récupération des employés----------------
+//   const [employees, setEmployees] = useState([]);
+//   useEffect(() => {
+//     getAllEmployees().then((data) => {
+//       setEmployees(data.data);
+//     });
+//   }, []);
+//   // -----------------------------------------
+
+//   //Création d'un nouvel employé--------------
+//   const handleAddEmployee = () => {
+//     const newEmployee = {
+//       lastname: 'Doe',
+//       firstname: 'John',
+//       phone: '123456789',
+//     };
+//     addEmployee(newEmployee).then(() => {
+//       getAllEmployees().then((data) => {
+//         setEmployees(data.data);
+//       });
+//     });
+//   };
+//   // -------------------------------------------
+
+//   //Mise à jour d'un employé--------------------
+//   const handleUpdateEmployee = (id) => {
+//     const updatedEmployee = {
+//       lastname: 'Tara',
+//       firstname: 'Dave',
+//       phone: '0909090909',
+//     };
+
+//     updateEmployee(id, updatedEmployee).then(() => {
+//       getAllEmployees().then((data) => {
+//         setEmployees(data.data);
+//       });
+//     });
+//   };
+//   // --------------------------------------------
+
+//   //Suppression d'un employé----------------------
+//   const handleDeleteEmployee = (id) => {
+//     deleteEmployee(id).then(() => {
+//       getAllEmployees().then((data) => {
+//         setEmployees(data.data);
+//       });
+//     });
+//   };
+//   // ---------------------------------------------
+
+//   return (
+//     <div className="dashboard">
+//       <h1>Tableau de bord de gestion des employés</h1>
+//       <table id="employee-table">
+//         <thead>
+//           <tr>
+//             <th>Nom</th>
+//             <th>Prénom</th>
+//             <th>Numéro</th>
+//             <th>Id</th>
+//             <th> Modification </th>
+//             <th> Suppression </th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {employees.map((item) => {
+//             return (
+//               <tr key={item.id}>
+//                 <td>{item.lastname}</td>
+//                 <td>{item.firstname}</td>
+//                 <td>{item.phone}</td>
+//                 <td>{item.id}</td>
+//                 <td>
+//                   <button
+//                     onClick={() => {
+//                       handleUpdateEmployee(item.id);
+//                       console.log('update!');
+//                     }}
+//                   >
+//                     Modifier
+//                   </button>
+//                 </td>
+//                 <td>
+//                   <button onClick={() => handleDeleteEmployee(item.id)}>
+//                     Supprimer
+//                   </button>
+//                 </td>
+//               </tr>
+//             );
+//           })}
+//         </tbody>
+//       </table>
+//       <button
+//         id="add-employee"
+//         onClick={() => {
+//           handleAddEmployee();
+//           console.log('create!');
+//         }}
+//       >
+//         Ajouter un employé
+//       </button>
+//     </div>
+//   );
+// }
+
+import React, { useState, useEffect } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { SelectButton } from 'primereact/selectbutton';
+import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
+import { addEmployee } from 'renderer/utils/api-call/addEmployee';
+import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
+import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
+import { Button } from '@mui/material';
+
+export default function SizeDemo() {
   const [employees, setEmployees] = useState([]);
+  const [reload, setReload] = useState(false);
   useEffect(() => {
+    if (reload) {
+      setReload(false);
+    }
     getAllEmployees().then((data) => {
       setEmployees(data.data);
     });
-  }, []);
-  // -----------------------------------------
+  }, [reload]);
 
-  //Création d'un nouvel employé--------------
-  const handleAddEmployee = () => {
+  // Fonction pour gérer la création d'un nouvel employé
+  const handleCreateEmployee = () => {
     const newEmployee = {
       lastname: 'Doe',
       firstname: 'John',
-      phone: '123456789',
+      email: 'toto@gmail.com',
+      phone: '0606060606',
+      id_roles: 1,
     };
-    addEmployee(newEmployee).then(() => {
-      getAllEmployees().then((data) => {
-        setEmployees(data.data);
-      });
+    addEmployee(newEmployee).finally(() => {
+      setReload(true);
     });
+    console.log('Créer un nouvel employé');
   };
-  // -------------------------------------------
+  // ------------------------------------------------------
 
-  //Mise à jour d'un employé--------------------
-  const handleUpdateEmployee = (id) => {
+  // Fonction pour modifier un employé en fonction de son ID
+  const handleEditEmployee = (id) => {
+    // Trouver l'employé correspondant à l'ID dans le tableau 'employees'
+    const employeeToUpdate = employees.find((employee) => employee.id === id);
+
+    if (!employeeToUpdate) {
+      console.error(`Employé avec l'ID ${id} introuvable.`);
+      return;
+    }
+
+    // Mettre à jour les informations de l'employé
     const updatedEmployee = {
+      ...employeeToUpdate,
       lastname: 'Tara',
       firstname: 'Dave',
+      email: 'dave.tara@gmail.com',
       phone: '0909090909',
+      id_roles: 1,
     };
 
-    updateEmployee(id, updatedEmployee).then(() => {
-      getAllEmployees().then((data) => {
-        setEmployees(data.data);
-      });
+    // Appeler l'API pour mettre à jour l'employé
+    updateEmployee(id, updatedEmployee).finally(() => {
+      setReload(true);
     });
-  };
-  // --------------------------------------------
 
-  //Suppression d'un employé----------------------
+    console.log(`Modifier l'employé avec l'ID : ${id}`);
+  };
+  // ------------------------------------------------------
+
+  // Fonction pour supprimer un employé en fonction de son ID
   const handleDeleteEmployee = (id) => {
     deleteEmployee(id).then(() => {
       getAllEmployees().then((data) => {
         setEmployees(data.data);
       });
     });
+    console.log(`Supprimer l'employé avec l'ID : ${id}`);
   };
-  // ---------------------------------------------
+  // ------------------------------------------------------
+
+  // Template pour le bouton de modification
+  const editButtonTemplate = (rowData) => {
+    return (
+      <Button
+        icon="pi pi-pencil"
+        rounded={true}
+        aria-label="Modifier"
+        onClick={() => handleEditEmployee(rowData.id)}
+      />
+    );
+  };
+  // ------------------------------------------------------
+
+  // Template pour le bouton de suppression
+  const deleteButtonTemplate = (rowData) => {
+    return (
+      <Button
+        icon="pi pi-times"
+        rounded={true}
+        severity="danger"
+        aria-label="Supprimer"
+        onClick={() => handleDeleteEmployee(rowData.id)}
+      />
+    );
+  };
+  // ------------------------------------------------------
 
   return (
-    <div className="dashboard">
-      <h1>Tableau de bord de gestion des employés</h1>
-      <table id="employee-table">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Numéro</th>
-            <th>Id</th>
-            <th> Modification </th>
-            <th> Suppression </th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((item) => {
-            return (
-              <tr key={item.id}>
-                <td>{item.lastname}</td>
-                <td>{item.firstname}</td>
-                <td>{item.phone}</td>
-                <td>{item.id}</td>
-                <td>
-                  <button
-                    onClick={() => {
-                      handleUpdateEmployee(item.id);
-                      console.log('update!');
-                    }}
-                  >
-                    Modifier
-                  </button>
-                </td>
-                <td>
-                  <button onClick={() => handleDeleteEmployee(item.id)}>
-                    Supprimer
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <button
-        id="add-employee"
-        onClick={() => {
-          handleAddEmployee();
-          console.log('create!');
-        }}
+    <div className="card">
+      <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
+        <Column field="id" header="Id"></Column>
+        <Column field="lastname" header="Nom"></Column>
+        <Column field="firstname" header="Prénom"></Column>
+        <Column field="email" header="Email"></Column>
+        <Column field="phone" header="Téléphone"></Column>
+        <Column header="Modifier" body={editButtonTemplate}></Column>
+        <Column header="Supprimer" body={deleteButtonTemplate}></Column>
+      </DataTable>
+      {/* Bouton de création */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleCreateEmployee}
       >
-        Ajouter un employé
-      </button>
+        Créer un nouvel employé
+      </Button>
     </div>
   );
 }

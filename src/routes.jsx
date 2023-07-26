@@ -1,32 +1,43 @@
-import { RamenDining } from "@mui/icons-material";
-import HomeIcon from '@mui/icons-material/Home';
-import { Route, Routes } from "react-router-dom";
-import CrudProducts from "renderer/crudProducts/CrudProducts";
-import HomeDrawer from "renderer/drawer/HomeDrawer";
-import Home from "renderer/home/Home";
+import { useContext } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import CrudProducts from './renderer/crudProducts/CrudProducts';
+import HomeDrawer from './renderer/drawer/HomeDrawer';
+import Login from './renderer/login/Login';
+import { UserContext } from './renderer/utils/UserContext';
 
-const RouteConfig = ()=>{
-const routes = [
+function RouteConfig() {
+  const { user } = useContext(UserContext);
+
+  const routes = [
     {
-        path: '/',
-        element: <HomeDrawer/>
+      path: '/',
+      component: Login,
     },
     {
-        path: '/home',
-        element: <Home/>
+      path: '/home',
+      component: HomeDrawer,
+      protected: true,
     },
     {
-        path: '/products',
-        element: <CrudProducts/>
+      path: '/products',
+      component: CrudProducts,
+      protected: true,
     },
-]
-return (
+  ];
+
+  return (
     <Routes>
-        {routes.map((route, index)=>(
-            <Route key={index} path={route.path} element={route.element} />
-        ))}
+      {routes.map((route) => {
+        let element;
+        if (route.protected) {
+          element = user ? <route.component /> : <Navigate to="/" />;
+        } else {
+          element = <route.component />;
+        }
+        return <Route key={route.path} path={route.path} element={element} />;
+      })}
     </Routes>
-)
+  );
 }
 
 export default RouteConfig;

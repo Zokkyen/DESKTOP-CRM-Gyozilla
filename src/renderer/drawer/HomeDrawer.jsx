@@ -1,24 +1,18 @@
-import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import React, { useContext } from 'react';
+import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import icon from '../../../assets/icon.png';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -27,11 +21,15 @@ import arrayNavigation from 'renderer/drawerNavigation';
 import Main from 'component/Main';
 import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
-import { Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import icon from '../../../assets/icon.png';
+import { UserContext } from '../utils/UserContext';
 
 const drawerWidth = 240;
 
-const HomeDrawer = () => {
+function HomeDrawer() {
+  const { user, logOut } = useContext(UserContext);
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -55,7 +53,6 @@ const HomeDrawer = () => {
   const [selectedItem, setSelectedItem] = React.useState(arrayNavigation[0]);
   const [mainContent, setMainContent] = React.useState(null); // État pour suivre le contenu du MAIN
 
-
   const handleItemClick = (item) => {
     setSelectedItem(item);
     setMainContent(null);
@@ -65,15 +62,25 @@ const HomeDrawer = () => {
     setMainContent(component);
   };
 
-    // Fonction callback qui renverra handleComponentLinkClick
-    const callback = (component) => {
-      handleComponentLinkClick(component);
+  // Fonction callback qui renverra handleComponentLinkClick
+  const callback = (component) => {
+    handleComponentLinkClick(component);
+  };
+
+  const handleLogout = () => {
+    logOut();
+    navigate('/');
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} drawerWidth={drawerWidth}>
+      <AppBar
+        style={{ backgroundColor: '#212830', color: '#FFF' }}
+        position="fixed"
+        open={open}
+        drawerWidth={drawerWidth}
+      >
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
           <IconButton
             color="inherit"
@@ -84,10 +91,7 @@ const HomeDrawer = () => {
           >
             <MenuOpenIcon />
           </IconButton>
-          <Link href="/home" underline='none'>
-            <img style={{width: '80px'}} src={icon} alt="Logo" />
-          </Link>
-          
+          <img style={{ width: '80px' }} src={icon} alt="Logo" />
           <Button
             style={{ color: 'white', backgroundColor: '#212830' }}
             id="demo-positioned-button"
@@ -96,7 +100,8 @@ const HomeDrawer = () => {
             aria-expanded={openMenu ? 'true' : undefined}
             onClick={handleClick}
           >
-            Levert M-A <KeyboardArrowDownIcon />
+            {user.lastname} {user.firstname}
+            <KeyboardArrowDownIcon />
           </Button>
           <Menu
             style={{ color: '#212830' }}
@@ -114,9 +119,9 @@ const HomeDrawer = () => {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>Mon profil</MenuItem>
+            <MenuItem onClick={handleClose}>Mon compte</MenuItem>
+            <MenuItem onClick={handleLogout}>Deconnexion</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
@@ -126,14 +131,15 @@ const HomeDrawer = () => {
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
+            backgroundColor: '#212830',
           },
         }}
         variant="persistent"
         anchor="left"
         open={open}
       >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
+        <DrawerHeader style={{ backgroundColor: '#212830' }}>
+          <IconButton style={{ color: '#FFFF' }} onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? (
               <ChevronLeftIcon />
             ) : (
@@ -141,19 +147,20 @@ const HomeDrawer = () => {
             )}
           </IconButton>
         </DrawerHeader>
-        <List>
-          {arrayNavigation.map((item, index) => (
-            <ListItem
-              key={index}
-              disablePadding
-              className={item === selectedItem ? 'active' : null}
-            >
-              <ListItemButton onClick={() => handleItemClick(item)}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText
-                  className={item === selectedItem ? 'barre' : null}
-                  primary={item.label}
-                />
+        <List style={{ backgroundColor: '#212830', color: '#FFFF' }}>
+          {arrayNavigation.map((item) => (
+            <ListItem key={item.id} disablePadding>
+              <ListItemButton
+                style={{
+                  backgroundColor:
+                    item === selectedItem ? '#f6a400' : '#212830',
+                }}
+                onClick={() => handleItemClick(item)}
+              >
+                <ListItemIcon style={{ color: '#FFFF' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -161,10 +168,12 @@ const HomeDrawer = () => {
       </Drawer>
       <Main open={open} drawerWidth={drawerWidth}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
-        {mainContent ? mainContent : selectedItem.component.callback({ callback })}
+        {mainContent
+          ? mainContent
+          : selectedItem.component.callback({ callback })}
       </Main>
     </Box>
   );
-};
+}
 
 export default HomeDrawer;
