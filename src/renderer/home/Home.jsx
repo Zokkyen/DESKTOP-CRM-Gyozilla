@@ -14,6 +14,7 @@ import React from 'react';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import CrudStock from 'renderer/crudStock/CrudStock';
 import CrudEmployee from 'renderer/crudEmployee/CrudEmployee';
+import OrdersPage from 'renderer/order/Order';
 
 const Home = ({ onLinkClick }) => {
   const handleLinkClick = (component) => {
@@ -124,7 +125,8 @@ const Home = ({ onLinkClick }) => {
           </Link>
         </Grid>
       </Grid>
-      <CrudEmployee></CrudEmployee>
+      {/* <CrudEmployee></CrudEmployee> */}
+      <OrdersPage />
     </Box>
   );
 };
