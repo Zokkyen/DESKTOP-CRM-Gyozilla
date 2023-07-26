@@ -6,9 +6,7 @@ import moment from 'moment';
 
 // Composant pour afficher une "card" d'order
 const OrderCard = ({ order }) => {
-  console.log('order', order);
   const getOrderTypeLabel = (orderTypeId) => {
-    console.log('orderTypeId', orderTypeId);
     switch (orderTypeId) {
       case 1:
         return 'Click & Collect';
@@ -24,17 +22,21 @@ const OrderCard = ({ order }) => {
   const getOrderStatusLabel = (orderStatusId) => {
     switch (orderStatusId) {
       case 1:
-        return 'En cours de préparation';
-      case 2:
         return 'Paiement en attente';
+      case 2:
+        return 'Payée';
       case 3:
-        return 'Livrée';
+        return 'En cours de préparation';
       case 4:
         return 'Préparée';
+      case 5:
+        return 'Livrée';
       default:
         return 'Status non renseigné';
     }
   };
+
+  const get
 
   const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
   const formattedHour = moment(order.date_order).format('HH:mm');
@@ -56,7 +58,8 @@ const OrderCard = ({ order }) => {
 
 const OrdersPage = () => {
   // État pour stocker les données des orders
-  const [ordersData, setOrdersData] = useState([]); // Initialisez comme un tableau vide
+  const [ordersData, setOrdersData] = useState([]);
+  console.log('ordersData', ordersData);
 
   //Récupère les orders depuis la base de données
   useEffect(() => {
@@ -76,8 +79,12 @@ const OrdersPage = () => {
 
   //Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(
-    (order) => order.id_status === '1'
+    (order) => order.id_status === 2
   ).length;
+
+  // Filtrer les commandes dont le statut est "payée"
+  const paidOrders = ordersData.filter((order) => order.id_status === 2);
+  console.log('paidOrders', paidOrders);
 
   return (
     <div>
@@ -85,7 +92,7 @@ const OrdersPage = () => {
         Récapitulatif des commandes en cours : {numberOfOrdersInProgress}
       </Typography>
       <Grid container spacing={2}>
-        {ordersData.map((order) => (
+        {paidOrders.map((order) => (
           <Grid item xs={12} sm={6} md={4} key={order.id}>
             <OrderCard order={order} />
           </Grid>
