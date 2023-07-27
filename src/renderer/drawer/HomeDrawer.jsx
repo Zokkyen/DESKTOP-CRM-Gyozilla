@@ -86,9 +86,16 @@ export default function HomeDrawer() {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{ width: '80px' }} src={icon} alt="Logo" />
+          <img
+            style={{ width: '80px', display: open ? 'none' : 'block' }}
+            src={icon}
+            alt="Logo"
+          />
           <Button
-            style={{ color: 'white', backgroundColor: '#212830' }}
+            variant="blackened"
+            style={{
+              display: open ? 'none' : 'flex',
+            }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
             aria-haspopup="true"
@@ -98,6 +105,7 @@ export default function HomeDrawer() {
             {user.lastname} {user.firstname}
             <KeyboardArrowDownIcon />
           </Button>
+
           <Menu
             style={{ color: '#212830' }}
             id="demo-positioned-menu"
@@ -145,7 +153,7 @@ export default function HomeDrawer() {
         <List>
           {arrayNavigation.map((item) => (
             <ListItem
-              key={item.id}
+              key={`item${Math.random(3)}`}
               disablePadding
               className={item === selectedItem ? 'active' : null}
             >
@@ -159,7 +167,7 @@ export default function HomeDrawer() {
           ))}
         </List>
       </Drawer>
-      <Main open={open} drawerWidth={drawerWidth}>
+      <Main open={open}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
         {mainContent || selectedItem.component.callback({ callback })}
       </Main>

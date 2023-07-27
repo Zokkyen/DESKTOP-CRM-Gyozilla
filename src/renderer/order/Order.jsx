@@ -58,7 +58,6 @@ function OrderCard({ order }) {
 function OrdersPage() {
   // État pour stocker les données des orders
   const [ordersData, setOrdersData] = useState([]);
-  console.log('ordersData', ordersData);
 
   // Récupère les orders depuis la base de données
   useEffect(() => {
@@ -83,7 +82,6 @@ function OrdersPage() {
 
   // Filtrer les commandes dont le statut est "payée"
   const paidOrders = ordersData.filter((order) => order.id_status === 2);
-  console.log('paidOrders', paidOrders);
 
   return (
     <div>

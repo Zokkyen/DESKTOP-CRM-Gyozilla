@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
+import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { Container, TextField, Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import { UserContext } from '../utils/context/UserContext';
 import instance from '../utils/interceptor';
 import GyozillaLogo from '../../images/logoHeader.png';
@@ -46,19 +47,29 @@ export default function Login() {
           })}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              const response = await instance.post(
-                'https://api.gyozilla-restaurants.fr/api/token',
-                values
+              const emailCheck = await instance.get(
+                `https://api.gyozilla-restaurants.fr/api/employees/exist/${values.email}`
               );
-
-              if (response.data.token) {
-                logIn(response.data.token);
-                navigate('/home');
+              if (emailCheck.data.message === 'true') {
+                try {
+                  const signin = await instance.post(
+                    'https://api.gyozilla-restaurants.fr/api/token',
+                    values
+                  );
+                  if (signin.data.token) {
+                    logIn(signin.data.token);
+                    navigate('/home');
+                  }
+                  setSubmitting(false);
+                } catch {
+                  toast.error("Le mot de passe n'est pas valide.");
+                }
+              } else {
+                toast.error("Le mail n'est pas valide.");
               }
             } catch (error) {
-              // handle error
+              toast.error(`Une erreur ${error} s'est produite.`);
             }
-            setSubmitting(false);
           }}
         >
           <Form
@@ -76,18 +87,17 @@ export default function Login() {
               as={TextField}
               label="Adresse mail"
             />
-            <ErrorMessage name="email" component="div" />
             <Field
               name="password"
               type="password"
               as={TextField}
               label="Mot de passe"
             />
-            <ErrorMessage name="password" component="div" />
             <Button type="submit">Connexion</Button>
           </Form>
         </Formik>
       </Container>
+      <ToastContainer />
     </>
   );
 }
