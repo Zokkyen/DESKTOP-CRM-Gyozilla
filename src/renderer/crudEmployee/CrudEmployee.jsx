@@ -124,6 +124,15 @@ import { Button } from '@mui/material';
 export default function CrudEmployee() {
   const [employees, setEmployees] = useState([]);
   const [reload, setReload] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [formData, setFormData] = useState({
+    lastname: '',
+    firstname: '',
+    email: '',
+    phone: '',
+    id_roles: 1,
+  });
   useEffect(() => {
     if (reload) {
       setReload(false);
@@ -133,59 +142,112 @@ export default function CrudEmployee() {
     });
   }, [reload]);
 
+  // Mise en place du scroll pour le CRUD
+  const ScrollCrud = () => {
+    return (
+      <div
+        style={{
+          overflow: 'auto',
+          width: '110%',
+          height: '600px',
+          marginTop: 100,
+        }}
+      >
+        <div className="card">
+          <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
+            <Column field="id" header="Id"></Column>
+            <Column field="lastname" header="Nom"></Column>
+            <Column field="firstname" header="Prénom"></Column>
+            <Column field="email" header="Email"></Column>
+            <Column field="phone" header="Téléphone"></Column>
+            <Column header="Modifier" body={editButtonTemplate}></Column>
+            <Column header="Supprimer" body={deleteButtonTemplate}></Column>
+          </DataTable>
+          {/* Bouton pour afficher le formulaire de création */}
+        </div>
+      </div>
+    );
+  };
+  // ------------------------------------------------------
+
   // Fonction pour gérer la création d'un nouvel employé
   const handleCreateEmployee = () => {
-    const newEmployee = {
-      lastname: 'Doe',
-      firstname: 'John',
-      email: 'toto@gmail.com',
-      phone: '0606060606',
-      id_roles: 1,
-    };
-    addEmployee(newEmployee).finally(() => {
+    addEmployee(formData).finally(() => {
       setReload(true);
+      setShowCreateForm(false);
+      setFormData({
+        lastname: '',
+        firstname: '',
+        email: '',
+        phone: '',
+        id_roles: 1,
+      });
     });
-    console.log('Créer un nouvel employé');
   };
   // ------------------------------------------------------
 
   // Fonction pour modifier un employé en fonction de son ID
-  const handleEditEmployee = (id) => {
+  const handleEditEmployee = (id, updatedEmployee) => {
     // Trouver l'employé correspondant à l'ID dans le tableau 'employees'
-    const employeeToUpdate = employees.find((employee) => employee.id === id);
-
-    if (!employeeToUpdate) {
-      console.error(`Employé avec l'ID ${id} introuvable.`);
-      return;
-    }
-
-    // Mettre à jour les informations de l'employé
-    const updatedEmployee = {
-      ...employeeToUpdate,
-      lastname: 'Tara',
-      firstname: 'Dave',
-      email: 'dave.tara@gmail.com',
-      phone: '0909090909',
-      id_roles: 1,
-    };
-
-    // Appeler l'API pour mettre à jour l'employé
     updateEmployee(id, updatedEmployee).finally(() => {
       setReload(true);
+      setShowEditForm(false);
+      setFormData({
+        lastname: '',
+        firstname: '',
+        email: '',
+        phone: '',
+        id_roles: 1,
+      });
     });
-
-    console.log(`Modifier l'employé avec l'ID : ${id}`);
   };
+
+  // Appeler l'API pour mettre à jour l'employé
+  // updateEmployee(id, updatedEmployee).finally(() => {
+  //   setReload(true);
+  // });
+
+  // console.log(`Modifier l'employé avec l'ID : ${id}`);
+
   // ------------------------------------------------------
 
   // Fonction pour supprimer un employé en fonction de son ID
   const handleDeleteEmployee = (id) => {
+    console.log(id);
     deleteEmployee(id).then(() => {
-      getAllEmployees().then((data) => {
-        setEmployees(data.data);
-      });
+      setReload(true);
     });
     console.log(`Supprimer l'employé avec l'ID : ${id}`);
+  };
+
+  // ------------------------------------------------------
+
+  // Fonction pour gérer l'affichage du formulaire de création
+  const handleShowCreateForm = () => {
+    setShowCreateForm(true);
+  };
+  // ------------------------------------------------------
+
+  // Fonction pour gérer l'affichage du formulaire de modification
+  const handleShowEditForm = (id) => {
+    const employeeToUpdate = employees.find((employee) => employee.id === id);
+
+    if (!employeeToUpdate) {
+      console.error(`Employé avec l'ID ${id} introuvable.`);
+    } else {
+      setShowEditForm(true);
+      setFormData(employeeToUpdate);
+    }
+  };
+  // ------------------------------------------------------
+
+  // Fonction pour gérer les changements de saisie dans les formulaires
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
   // ------------------------------------------------------
 
@@ -193,11 +255,15 @@ export default function CrudEmployee() {
   const editButtonTemplate = (rowData) => {
     return (
       <Button
+        variant="contained"
+        color="primary"
         icon="pi pi-pencil"
         rounded={true}
         aria-label="Modifier"
-        onClick={() => handleEditEmployee(rowData.id)}
-      />
+        onClick={() => handleShowEditForm(rowData.id)}
+      >
+        Modifier
+      </Button>
     );
   };
   // ------------------------------------------------------
@@ -210,28 +276,102 @@ export default function CrudEmployee() {
         rounded={true}
         severity="danger"
         aria-label="Supprimer"
+        variant="contained"
+        color="secondary"
         onClick={() => handleDeleteEmployee(rowData.id)}
-      />
+      >
+        Supprimer
+      </Button>
     );
   };
   // ------------------------------------------------------
 
+  // Formulaire de création
+  const createForm = showCreateForm && (
+    <div>
+      <h2>Créer un nouvel employé</h2>
+      <label>Nom</label>
+      <input
+        type="text"
+        name="lastname"
+        value={formData.lastname}
+        onChange={handleChange}
+      />
+      <label>Prénom</label>
+      <input
+        type="text"
+        name="firstname"
+        value={formData.firstname}
+        onChange={handleChange}
+      />
+      <label>Email</label>
+      <input
+        type="text"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+      />
+      <label>Téléphone</label>
+      <input
+        type="text"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+      />
+      <button onClick={handleCreateEmployee}>Créer</button>
+    </div>
+  );
+  // ------------------------------------------------------
+
+  // Formulaire de modification
+  const editForm = showEditForm && (
+    <div>
+      <h2>Modifier l'employé</h2>
+      <label>Nom</label>
+      <input
+        type="text"
+        name="lastname"
+        value={formData.lastname}
+        onChange={handleChange}
+      />
+      <label>Prénom</label>
+      <input
+        type="text"
+        name="firstname"
+        value={formData.firstname}
+        onChange={handleChange}
+      />
+      <label>Email</label>
+      <input
+        type="text"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+      />
+      <label>Téléphone</label>
+      <input
+        type="text"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+      />
+      <button onClick={() => handleEditEmployee(formData.id, formData)}>
+        Enregistrer
+      </button>
+    </div>
+  );
+  // ------------------------------------------------------
+
   return (
-    <div className="card">
-      <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
-        <Column field="id" header="Id"></Column>
-        <Column field="lastname" header="Nom"></Column>
-        <Column field="firstname" header="Prénom"></Column>
-        <Column field="email" header="Email"></Column>
-        <Column field="phone" header="Téléphone"></Column>
-        <Column header="Modifier" body={editButtonTemplate}></Column>
-        <Column header="Supprimer" body={deleteButtonTemplate}></Column>
-      </DataTable>
-      {/* Bouton de création */}
+    <div style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <ScrollCrud />
+      {createForm}
+      {editForm}
       <Button
+        style={{ marginBottom: 20, marginLeft: 300 }}
         variant="contained"
         color="primary"
-        onClick={handleCreateEmployee}
+        onClick={handleShowCreateForm}
       >
         Créer un nouvel employé
       </Button>
