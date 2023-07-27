@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
-import { useTheme } from '@mui/material/styles';
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { useContext, useState } from 'react';
+import { useTheme, styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -27,11 +28,47 @@ import { UserContext } from '../utils/context/UserContext';
 
 const drawerWidth = 240;
 
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'left',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'left',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 2,
+    marginLeft: '20px',
+    marginTop: theme.spacing(1),
+    minWidth: 150,
+    minHeight: 'fit-content',
+    paddingBottom: '5px',
+    color: '#EAEAEA',
+    backgroundColor: '#212830',
+    boxShadow:
+      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+
+    '& .MuiMenuItem-root:hover': {
+      backgroundColor: '#EAEAEA',
+      color: '#212830',
+    },
+  },
+}));
+
 export default function HomeDrawer() {
   const { user, logOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
+  const [selectedItem, setSelectedItem] = useState(arrayNavigation[0]);
+  const [mainContent, setMainContent] = useState(null); // État pour suivre le contenu du MAIN
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -50,12 +87,10 @@ export default function HomeDrawer() {
     setOpen(false);
   };
 
-  const [selectedItem, setSelectedItem] = React.useState(arrayNavigation[0]);
-  const [mainContent, setMainContent] = React.useState(null); // État pour suivre le contenu du MAIN
-
   const handleItemClick = (item) => {
     setSelectedItem(item);
     setMainContent(null);
+    handleDrawerClose();
   };
 
   const handleComponentLinkClick = (component) => {
@@ -65,6 +100,11 @@ export default function HomeDrawer() {
   // Fonction callback qui renverra handleComponentLinkClick
   const callback = (component) => {
     handleComponentLinkClick(component);
+  };
+
+  const handleProfile = () => {
+    const profileItem = arrayNavigation.find((item) => item.label === 'Profil');
+    handleItemClick(profileItem);
   };
 
   const handleLogout = () => {
@@ -86,9 +126,20 @@ export default function HomeDrawer() {
           >
             <MenuOpenIcon />
           </IconButton>
-          <img style={{ width: '80px' }} src={icon} alt="Logo" />
+          <img
+            style={{
+              width: '80px',
+              display: open ? 'none' : 'block',
+              marginLeft: '135px',
+            }}
+            src={icon}
+            alt="Logo"
+          />
           <Button
-            style={{ color: 'white', backgroundColor: '#212830' }}
+            variant="blackened"
+            style={{
+              display: open ? 'none' : 'flex',
+            }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}
             aria-haspopup="true"
@@ -98,26 +149,17 @@ export default function HomeDrawer() {
             {user.lastname} {user.firstname}
             <KeyboardArrowDownIcon />
           </Button>
-          <Menu
+          <StyledMenu
             style={{ color: '#212830' }}
             id="demo-positioned-menu"
             aria-labelledby="demo-positioned-button"
             anchorEl={anchorEl}
             open={openMenu}
             onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
           >
-            <MenuItem onClick={handleClose}>Mon profil</MenuItem>
-            <MenuItem onClick={handleClose}>Mon compte</MenuItem>
+            <MenuItem onClick={handleProfile}>Mon profil</MenuItem>
             <MenuItem onClick={handleLogout}>Deconnexion</MenuItem>
-          </Menu>
+          </StyledMenu>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -132,6 +174,7 @@ export default function HomeDrawer() {
         variant="persistent"
         anchor="left"
         open={open}
+        onClose={handleDrawerClose}
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
@@ -145,7 +188,7 @@ export default function HomeDrawer() {
         <List>
           {arrayNavigation.map((item) => (
             <ListItem
-              key={item.id}
+              key={`item${Math.random(3)}`}
               disablePadding
               className={item === selectedItem ? 'active' : null}
             >
@@ -159,7 +202,7 @@ export default function HomeDrawer() {
           ))}
         </List>
       </Drawer>
-      <Main open={open} drawerWidth={drawerWidth}>
+      <Main open={open}>
         {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
         {mainContent || selectedItem.component.callback({ callback })}
       </Main>
