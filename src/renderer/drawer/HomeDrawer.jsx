@@ -92,10 +92,9 @@ export default function HomeDrawer() {
             alt="Logo"
           />
           <Button
+            variant="blackened"
             style={{
-              color: 'white',
-              backgroundColor: '#212830',
-              display: open ? 'none' : 'block',
+              display: open ? 'none' : 'flex',
             }}
             id="demo-positioned-button"
             aria-controls={openMenu ? 'demo-positioned-menu' : undefined}

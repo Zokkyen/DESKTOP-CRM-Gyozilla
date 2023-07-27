@@ -38,7 +38,7 @@ instance.interceptors.response.use(
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      console.log(error.response);
+      // console.log(error.response);
       // Déconnexion de l'utilisateur et suppression du token
       localStorage.removeItem('token');
       // window.location.href = '/login'; // rediriger vers la page de connexion

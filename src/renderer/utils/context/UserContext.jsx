@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable camelcase */
 import React, {
   createContext,
@@ -10,7 +11,6 @@ import jwt_decode from 'jwt-decode';
 
 export const UserContext = createContext({});
 
-// eslint-disable-next-line react/prop-types
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
