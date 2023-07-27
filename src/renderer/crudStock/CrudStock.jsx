@@ -291,7 +291,7 @@ const actionBodyTemplate = (rowData) => {
 
 const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-        <h4 className="m-0">Gestion du stock</h4>
+        <h4 style={{color: '#212830'}} className="m-0">Gestion du stock</h4>
         <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
@@ -375,8 +375,8 @@ return (
                   />
                 <ErrorMessage name="quantity" />
                 <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
-                  <Button style={{marginRight: '10px'}} label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
-                  <Button label="Sauvegarder" type='submit' icon="pi pi-check" onClick={handleSubmit}/>
+                  <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
+                  <Button style={{backgroundColor: '#4f7170', border: '1px solid #4f7170'}} label="Sauvegarder" type='submit' icon="pi pi-check" onClick={handleSubmit}/>
                 </Box>
 
                 </Form>
@@ -394,7 +394,7 @@ return (
                 )}
             </div>
             <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-              <Button style={{marginRight: '10px'}} label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientDialog} />
+              <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientDialog} />
               <Button label="Oui" icon="pi pi-check" severity="danger" onClick={() => deleteIngredient(ingredient.id)}/>
             </Box>
         </Dialog>
@@ -406,7 +406,7 @@ return (
                 {ingredient && <span> Êtes-vous sûr de vouloir supprimer l'ingredient ?</span>}
             </div>
             <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-              <Button label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientsDialog} />
+              <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientsDialog} />
               <Button label="Oui" icon="pi pi-check" severity="danger" onClick={deleteSelectedIngredients} />
             </Box>
         </Dialog>
