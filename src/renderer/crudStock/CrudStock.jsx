@@ -15,13 +15,19 @@ import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import { Badge } from 'primereact/badge';
 import { getAllIngredients } from 'renderer/utils/api-call/getAllIngredients';
+import { Box, InputAdornment,TextField, Typography } from '@mui/material';
+import { ErrorMessage, Form, Formik } from 'formik';
+import * as Yup from "yup";
+import { updatedIngredientById } from 'renderer/utils/api-call/updatedIngredientById';
+import { createdIngredient } from 'renderer/utils/api-call/createdIngredient';
+import { deleteIngredientById } from 'renderer/utils/api-call/deleteIngredient';
 
 const CrudStock = () => {
-  let emptyIngredients = {
+  const emptyIngredients = {
     name: '',
-    quantity: '',
     purchasePrice: '',
-};
+    quantity: '',
+  };
 
 const [ingredients, setIngredients] = useState(null);
 const [ingredientDialog, setIngredientDialog] = useState(false);
@@ -33,14 +39,29 @@ const [submitted, setSubmitted] = useState(false);
 const [globalFilter, setGlobalFilter] = useState(null);
 const toast = useRef(null);
 const dt = useRef(null);
+const [isLoad, setIsLoad] = useState(false);
 
-// useEffect(()=>{
-//   getAllIngredients()
-//   .then((res)=>{
-    
-//   })
-// })
+useEffect(()=>{
+  getAllIngredients()
+  .then((res)=>{
+    if (res.data) {
+      setIngredients(res.data);
+    }
+  }).finally(()=>{
+    setIsLoad(true)
+  })
+}, [isLoad])
 
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .required("Le libellé est obligatoire"),
+  purchasePrice: Yup.number()
+    .positive("Le prix ne peut être inférieur à 0€")
+    .required("Le prix est obligatoire"),
+  quantity: Yup.number()
+    .required("La quantité est obligatoire")
+});
 
 const formatCurrency = (value) => {
     return value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
@@ -65,29 +86,51 @@ const hideDeleteIngredientsDialog = () => {
     setDeleteIngredientsDialog(false);
 };
 
-const saveIngredient = () => {
-    setSubmitted(true);
-
-    if (ingredient.name.trim()) {
-        let _ingredients = [...ingredients];
-        let _ingredient = { ...ingredient };
-
-        if (ingredient.id) {
-            const index = findIndexById(ingredient.id);
-
-            _ingredients[index] = _ingredient;
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ingredient Updated', life: 3000 });
-        } else {
-            _ingredient.id = createId();
-            _ingredient.image = 'ingredient-placeholder.svg';
-            _ingredients.push(_ingredient);
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ingredient Created', life: 3000 });
-        }
-
-        setIngredients(_ingredients);
+const saveIngredient = (values,id) => {
+    const _ingredient = { ...values };
+    if (id) {
+    updatedIngredientById(_ingredient, id)
+    .then((res)=>{
+      if (res.data.message === 'Mis à jour') {
+        toast.current.show({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'L\'ingredient a été mis à jour',
+          life: 3000
+        });
         setIngredientDialog(false);
-        setIngredient(emptyIngredients);
-    }
+        setIsLoad(false)
+      }
+    }).catch((error) => {
+      toast.current.show({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'L\'ingredient n\'a pas été mis à jour',
+        life: 3000
+      });
+      });
+  } else {
+    createdIngredient(_ingredient)
+    .then((res)=>{
+      if (res.data.message === 'created') {
+        toast.current.show({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'L\ingredient a bien été ajouté',
+          life: 3000
+        });
+        setIngredientDialog(false);
+        setIsLoad(false)
+      }
+    }).catch((error) => {
+      toast.current.show({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'L\'ingredient n\'a pas été ajouté',
+        life: 3000
+      });
+      });
+  }
 };
 
 const editIngredient = (ingredient) => {
@@ -100,13 +143,28 @@ const confirmDeleteIngredient = (ingredient) => {
     setDeleteIngredientDialog(true);
 };
 
-const deleteIngredient = () => {
-    let _ingredients = ingredients.filter((val) => val.id !== ingredient.id);
-
-    setIngredients(_ingredients);
-    setDeleteIngredientDialog(false);
-    setIngredient(emptyIngredients);
-    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ingredient Deleted', life: 3000 });
+const deleteIngredient = (id) => {
+    deleteIngredientById(id)
+    .then((res)=>{
+      if (res.status === 200) {
+        const _ingredients = ingredients.filter((item) => item.id !== ingredient.id);
+        setIngredients(_ingredients);
+        setDeleteIngredientDialog(false);
+        toast.current.show({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'L\'ingredient a été supprimé',
+          life: 3000
+        });
+      }
+    }).catch(()=>{
+      toast.current.show({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'L\'ingredient n\'a pas été supprimé',
+        life: 3000
+      });
+    })
 };
 
 const findIndexById = (id) => {
@@ -122,17 +180,6 @@ const findIndexById = (id) => {
     return index;
 };
 
-const createId = () => {
-    let id = '';
-    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return id;
-};
-
 const exportCSV = () => {
     dt.current.exportCSV();
 };
@@ -142,50 +189,71 @@ const confirmDeleteSelected = () => {
 };
 
 const deleteSelectedIngredients = () => {
-    let _ingredients = ingredients.filter((val) => !selectedIngredients.includes(val));
+  // Créez un tableau de promesses pour chaque suppression d'ingrédient
+  const deletePromises = selectedIngredients.map((selectedIngredient) =>
+    deleteIngredientById(selectedIngredient.id)
+  );
 
-    setIngredients(_ingredients);
-    setDeleteIngredientsDialog(false);
-    setSelectedIngredients(null);
-    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ingredient supprimé', life: 3000 });
-};
+  // Exécutez toutes les suppressions en parallèle
+  Promise.all(deletePromises)
+    .then((responses) => {
+      // Vérifiez si toutes les suppressions sont réussies (statut 200)
+      const allDeleted = responses.every((res) => res.status === 200);
 
-const onCategoryChange = (e) => {
-    let _ingredient = { ...ingredient };
-
-    _ingredient['category'] = e.value;
-    setIngredient(_ingredient);
-};
-
-const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || '';
-    let _ingredient = { ...ingredient };
-
-    _ingredient[`${name}`] = val;
-
-    setIngredient(_ingredient);
-};
-
-const onInputNumberChange = (e, name) => {
-    const val = e.value || 0;
-    let _ingredient = { ...ingredient };
-
-    _ingredient[`${name}`] = val;
-
-    setIngredient(_ingredient);
+      if (allDeleted) {
+        // Filtrer les ingrédients pour supprimer ceux qui ont été sélectionnés
+        const _ingredients = ingredients.filter(
+          (item) => !selectedIngredients.includes(item)
+        );
+        setIngredients(_ingredients);
+        setDeleteIngredientsDialog(false);
+        setSelectedIngredients(null); // Réinitialisez la sélection
+        toast.current.show({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'Ingredient(s) supprimé(s)',
+          life: 3000
+        });
+      } else {
+        // Gérer les cas où certaines suppressions ont échoué
+        toast.current.show({
+          severity: 'danger',
+          summary: 'Error',
+          detail: 'Impossible de supprimer la/les sélection(s)',
+          life: 3000
+        });
+      }
+    })
+    .catch(() => {
+      // Gérer les erreurs d'API
+      toast.current.show({
+        severity: 'danger',
+        summary: 'Error',
+        detail: 'Impossible de supprimer la/les sélection(s)',
+        life: 3000
+      });
+    });
 };
 
 const leftToolbarTemplate = () => {
     return (
         <div className="flex flex-wrap gap-2">
-            <Button style={{marginRight: '6px'}} label="Ajouter" icon="pi pi-plus" severity="success" onClick={openNew} />
+            <Button style={{marginRight: '6px', backgroundColor: '#4f7170', border: '1px solid #4f7170'}} label="Ajouter" icon="pi pi-plus" onClick={openNew} />
             <Button label="Supprimer" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedIngredients || !selectedIngredients.length} />
         </div>
     );
 };
 
 const rightToolbarTemplate = () => {
-    return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+    return <Button label="Export" style={{backgroundColor: '#00656f', border: '1px solid #00656f'}} icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+};
+
+const codeBodyTemplate = (rowData) => {
+  return <Typography variant='BUTTON TEXT'>{rowData.id}</Typography>;
+};
+
+const labelBodyTemplate = (rowData) => {
+  return <Typography variant='BUTTON TEXT'>{rowData.name}</Typography>;
 };
 
 const priceBodyTemplate = (rowData) => {
@@ -195,7 +263,7 @@ const priceBodyTemplate = (rowData) => {
 const quantityBodyTemplate = (rowData) => {
   if (rowData.quantity > 100) {
     return <Badge value={rowData.quantity} severity="success"></Badge>;
-} else if (rowData.quantity >= 50 && rowData.quantity < 100) {
+} else if (rowData.quantity > 0 && rowData.quantity < 100) {
     return <Badge value={rowData.quantity} severity="warning"></Badge>;
 } else {
     return <Badge value={rowData.quantity} severity="danger"></Badge>;
@@ -205,7 +273,7 @@ const quantityBodyTemplate = (rowData) => {
 const statusBodyTemplate = (rowData) => {
   if (rowData.quantity > 100) {
     return <Tag value="En Stock" icon="pi pi-check" severity="success"></Tag>;
-  } else if (rowData.quantity >= 50 && rowData.quantity < 100) {
+  } else if (rowData.quantity > 0 && rowData.quantity < 100) {
     return <Tag value="Stock bas" icon="pi pi-exclamation-triangle" severity="warning"></Tag>;
   } else {
     return <Tag value="Stock épuisé" icon="pi pi-times" severity="danger"></Tag>;
@@ -215,40 +283,22 @@ const statusBodyTemplate = (rowData) => {
 const actionBodyTemplate = (rowData) => {
     return (
         <React.Fragment>
-            <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editIngredient(rowData)} />
+            <Button icon="pi pi-pencil" style={{color: '#212830', marginRight: '6px'}} rounded outlined onClick={() => editIngredient(rowData)} />
             <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteIngredient(rowData)} />
         </React.Fragment>
     );
 };
 
-
 const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
-        <h4 className="m-0">Gestion du stock</h4>
+        <h4 style={{color: '#212830'}} className="m-0">Gestion du stock</h4>
         <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
         </span>
     </div>
 );
-const ingredientDialogFooter = (
-    <React.Fragment>
-        <Button label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
-        <Button label="Sauvegarder" icon="pi pi-check" onClick={saveIngredient} />
-    </React.Fragment>
-);
-const deleteIngredientDialogFooter = (
-    <React.Fragment>
-        <Button label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientDialog} />
-        <Button label="Oui" icon="pi pi-check" severity="danger" onClick={deleteIngredient} />
-    </React.Fragment>
-);
-const deleteIngredientsDialogFooter = (
-    <React.Fragment>
-        <Button label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientsDialog} />
-        <Button label="Oui" icon="pi pi-check" severity="danger" onClick={deleteSelectedIngredients} />
-    </React.Fragment>
-);
+
 
 return (
     <div>
@@ -258,10 +308,10 @@ return (
             <DataTable ref={dt} value={ingredients} selection={selectedIngredients} onSelectionChange={(e) => setSelectedIngredients(e.value)}
                     dataKey="id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} ingredients" globalFilter={globalFilter} header={header}>
+                    currentPageReportTemplate="Afficher {first} à {last} sur {totalRecords} ingrédients" globalFilter={globalFilter} header={header}>
                 <Column selectionMode="multiple" exportable={false}></Column>
-                <Column field="code" header="Code" sortable style={{ minWidth: '12rem' }}></Column>
-                <Column field="label" header="Libelle" sortable style={{ minWidth: '16rem' }}></Column>
+                <Column field="code" header="Code" body={codeBodyTemplate}  sortable style={{ minWidth: '12rem' }}></Column>
+                <Column field="name" header="Libelle" body={labelBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>
                 <Column field="purchasePrice" header="Prix" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
                 <Column field="quantity" header="Quantité" body={quantityBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
                 <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
@@ -269,49 +319,96 @@ return (
             </DataTable>
         </div>
 
-        <Dialog visible={ingredientDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Ingredient Details" modal className="p-fluid" footer={ingredientDialogFooter} onHide={hideDialog}>
-            <div className="field">
-                <label htmlFor="label" className="font-bold">
-                    Libellé
-                </label>
-                <InputText id="label" value={ingredient.name} onChange={(e) => onInputChange(e, 'label')} required autoFocus className={classNames({ 'p-invalid': submitted && !ingredient.name })} />
-                {submitted && !ingredient.name && <small className="p-error">Le libelle est obligatoire.</small>}
-            </div>
+      {/* Modal details et modif */}
+        <Dialog visible={ingredientDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Détails de l'ingredient" modal className="p-fluid" onHide={hideDialog}>
+          <Formik
+            initialValues={{
+              name: ingredient.name,
+              purchasePrice: ingredient.purchasePrice,
+              quantity: ingredient.quantity
+            }}
+            validationSchema={validationSchema}
+            onSubmit={(values)=>{
+              saveIngredient(values, ingredient.id)
+            }}
+          >
+            {({ values, handleChange,handleSubmit, errors, touched, isSubmitting }) => {
+              return (
+                <Form>
+                  <TextField
+                    value={values.name} 
+                    onChange={handleChange}
+                    label="Libellé"
+                    id="name"
+                    name='name'
+                    type='text'
+                    sx={{ m: 1, width: "100%" }}
+                  />
+                  <ErrorMessage name="name" />
 
-            <div className="formgrid grid">
-                <div className="field col">
-                    <label htmlFor="purchasePrice" className="font-bold">
-                        Prix
-                    </label>
-                    <InputNumber id="purchasePrice" value={ingredient.purchasePrice} onValueChange={(e) => onInputNumberChange(e, 'purchasePrice')} minFractionDigits={2} mode="currency" currency="EUR" locale="fr-FR" />
-                    {submitted && !ingredient.purchasePrice && <small className="p-error">Le prix est obligatoire.</small>}
-                </div>
-                <div className="field col">
-                    <label htmlFor="quantity" className="font-bold">
-                        Quantité
-                    </label>
-                    <InputNumber id="quantity" value={ingredient.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} min={0} max={100}/>
-                    {submitted && !ingredient.quantity && <small className="p-error">La quantité est obligatoire.</small>}
-                </div>
-            </div>
+                  <TextField
+                    value={values.purchasePrice} 
+                    onChange={handleChange}
+                    label="Prix"
+                    id="purchasePrice"
+                    name='purchasePrice'
+                    type='number'
+                    sx={{ m: 1, width: "25ch" }}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                      inputProps: { min: 0 }
+                    }}
+                  />
+                  <ErrorMessage name="purchasePrice" />
+
+                  <TextField
+                    value={values.quantity} 
+                    onChange={handleChange}
+                    label="Quantité"
+                    id="quantity"
+                    name='quantity'
+                    type='number'
+                    sx={{ m: 1, width: "25ch" }}
+                    InputProps={{
+                      inputProps : {min : 0}
+                    }}
+                  />
+                <ErrorMessage name="quantity" />
+                <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
+                  <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
+                  <Button style={{backgroundColor: '#4f7170', border: '1px solid #4f7170'}} label="Sauvegarder" type='submit' icon="pi pi-check" onClick={handleSubmit}/>
+                </Box>
+
+                </Form>
+              );
+            }}
+          </Formik>
         </Dialog>
 
-        <Dialog visible={deleteIngredientDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Valider" modal footer={deleteIngredientDialogFooter} onHide={hideDeleteIngredientDialog}>
+        {/* Modal delete ingredient */}
+        <Dialog visible={deleteIngredientDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Valider" modal onHide={hideDeleteIngredientDialog}>
             <div className="confirmation-content">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 {ingredient && (
-                    <span>
-                        Êtes-vous sûr de vouloir supprimer<b>{ingredient.name}</b>?
-                    </span>
+                    <span> Êtes-vous sûr de vouloir supprimer <b>{ingredient.name}</b>?</span>
                 )}
             </div>
+            <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+              <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientDialog} />
+              <Button label="Oui" icon="pi pi-check" severity="danger" onClick={() => deleteIngredient(ingredient.id)}/>
+            </Box>
         </Dialog>
-
-        <Dialog visible={deleteIngredientsDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Valider" modal footer={deleteIngredientsDialogFooter} onHide={hideDeleteIngredientsDialog}>
+        
+        {/* Modal delete selection ingredient */}
+        <Dialog visible={deleteIngredientsDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Valider" modal onHide={hideDeleteIngredientsDialog}>
             <div className="confirmation-content">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                {ingredient && <span>Êtes-vous sûr de vouloir supprimer l'ingrédient ?</span>}
+                {ingredient && <span> Êtes-vous sûr de vouloir supprimer l'ingredient ?</span>}
             </div>
+            <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
+              <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Non" icon="pi pi-times" outlined onClick={hideDeleteIngredientsDialog} />
+              <Button label="Oui" icon="pi pi-check" severity="danger" onClick={deleteSelectedIngredients} />
+            </Box>
         </Dialog>
     </div>
 );
