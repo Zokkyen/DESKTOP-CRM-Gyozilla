@@ -9,6 +9,10 @@ import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
 import { Button } from '@mui/material';
 import { TextField, Grid } from '@mui/material';
 import { Dialog } from 'primereact/dialog';
+import IconButton from '@mui/material/IconButton';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function CrudEmployee() {
   const [employees, setEmployees] = useState([]);
@@ -22,6 +26,18 @@ export default function CrudEmployee() {
     phone: '',
     id_roles: 1,
   });
+
+  const roles = {
+    1: 'Préparateur de commande',
+    2: 'Cuisinier',
+    3: 'Manager',
+    4: 'Gérant',
+  };
+
+  const roleTemplate = (rowData) => {
+    return roles[rowData.id_roles] || 'Role non défini';
+  };
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
@@ -47,9 +63,15 @@ export default function CrudEmployee() {
       >
         <div className="card">
           <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
-            <Column field="id" header="Id"></Column>
+            <Column field="id" header="Id" style={{ color: 'green' }}></Column>
             <Column field="lastname" header="Nom"></Column>
             <Column field="firstname" header="Prénom"></Column>
+            <Column
+              field="id_roles"
+              style={{ color: 'blue' }}
+              header="Rôle"
+              body={roleTemplate}
+            ></Column>
             <Column field="email" header="Email"></Column>
             <Column field="phone" header="Téléphone"></Column>
             <Column header="Modifier" body={editButtonTemplate}></Column>
@@ -69,9 +91,9 @@ export default function CrudEmployee() {
       setFormData({
         lastname: '',
         firstname: '',
+        id_roles: '',
         email: '',
         phone: '',
-        id_roles: 1,
       });
     });
   };
@@ -86,9 +108,9 @@ export default function CrudEmployee() {
       setFormData({
         lastname: '',
         firstname: '',
+        id_roles: '',
         email: '',
         phone: '',
-        id_roles: 1,
       });
     });
   };
@@ -192,17 +214,23 @@ export default function CrudEmployee() {
   // Template pour le bouton de modification
   const editButtonTemplate = (rowData) => {
     return (
-      <Button
-        variant="contained"
+      // <Button
+      //   variant="contained"
+      //   color="primary"
+      //   icon="pi pi-pencil"
+      //   rounded={true}
+      //   aria-label="Modifier"
+      //   style={{ backgroundColor: 'orange', color: 'white' }}
+      //   onClick={() => handleShowEditForm(rowData.id)}
+      // >
+      //   Modifier
+      // </Button>
+      <IconButton
         color="primary"
-        icon="pi pi-pencil"
-        rounded={true}
-        aria-label="Modifier"
-        style={{ backgroundColor: 'orange', color: 'white' }}
         onClick={() => handleShowEditForm(rowData.id)}
       >
-        Modifier
-      </Button>
+        <EditIcon style={{ color: 'orange' }} />
+      </IconButton>
     );
   };
   // ------------------------------------------------------
@@ -210,18 +238,24 @@ export default function CrudEmployee() {
   // Template pour le bouton de suppression
   const deleteButtonTemplate = (rowData) => {
     return (
-      <Button
-        icon="pi pi-times"
-        rounded={true}
-        severity="danger"
-        aria-label="Supprimer"
-        variant="contained"
-        style={{ backgroundColor: 'red', color: 'white' }}
+      // <Button
+      //   icon="pi pi-times"
+      //   rounded={true}
+      //   severity="danger"
+      //   aria-label="Supprimer"
+      //   variant="contained"
+      //   style={{ backgroundColor: 'red', color: 'white' }}
+      //   color="secondary"
+      //   onClick={() => handleDeleteEmployee(rowData.id)}
+      // >
+      //   Supprimer
+      // </Button>
+      <IconButton
         color="secondary"
         onClick={() => handleDeleteEmployee(rowData.id)}
       >
-        Supprimer
-      </Button>
+        <DeleteIcon style={{ color: 'red' }} />
+      </IconButton>
     );
   };
   // ------------------------------------------------------
@@ -250,6 +284,13 @@ export default function CrudEmployee() {
           type="text"
           name="firstname"
           value={formData.firstname}
+          onChange={handleChange}
+        />
+        <input
+          placeholder="Rôle"
+          type="text"
+          name="id_roles"
+          value={formData.id_roles}
           onChange={handleChange}
         />
         <input
@@ -310,6 +351,13 @@ export default function CrudEmployee() {
           onChange={handleChange}
         />
         <input
+          placeholder="Rôle"
+          type="text"
+          name="id_roles"
+          value={formData.id_roles}
+          onChange={handleChange}
+        />
+        <input
           placeholder="Email"
           type="text"
           name="email"
@@ -346,10 +394,10 @@ export default function CrudEmployee() {
       {createForm}
       {editForm}
       {deleteConfirmDialog}
-      <Button
+      {/* <Button
         style={{
           marginBottom: 20,
-          marginLeft: 400,
+          marginLeft: 420,
           backgroundColor: 'blue',
           color: 'white',
         }}
@@ -358,7 +406,15 @@ export default function CrudEmployee() {
         onClick={handleShowCreateForm}
       >
         Créer un nouvel employé
-      </Button>
+      </Button> */}
+      <IconButton onClick={handleShowCreateForm}>
+        <AddCircleIcon
+          style={{ color: 'blue', fontSize: '40', alignSelf: 'center' }}
+        />{' '}
+      </IconButton>
+      <span style={{ color: 'blue', fontWeight: 'bold', fontSize: 20 }}>
+        Ajouter un employé
+      </span>
     </div>
   );
 }
