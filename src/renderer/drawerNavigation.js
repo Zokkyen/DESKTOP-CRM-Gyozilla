@@ -2,10 +2,12 @@ import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import CrudStock from './crudStock/CrudStock';
 import Profile from './profile/Profile';
 import Home from './home/Home';
+import Ca from './ca/Ca';
 
 const arrayNavigation = [
   {
@@ -13,6 +15,13 @@ const arrayNavigation = [
     icon: <HomeIcon />,
     component: {
       callback: ({ callback }) => <Home onLinkClick={callback} />,
+    },
+  },
+  {
+    label: 'CA',
+    icon: <TrendingUpIcon />,
+    component: {
+      callback: ({ callback }) => <Ca onLinkClick={callback} />,
     },
   },
   {
