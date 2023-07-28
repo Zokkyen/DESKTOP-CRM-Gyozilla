@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -28,9 +28,12 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { io } from 'socket.io-client';
+import { Toast } from 'primereact/toast';
 
 // Composant pour afficher une "card" d'order
 function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
+  const toast = useRef(null);
+
   const getOrderTypeLabel = (orderTypeId) => {
     switch (orderTypeId) {
       case 1:
@@ -106,6 +109,12 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
         data = { id_status: 3 };
       } else if (order.id_status === 3) {
         data = { id_status: 4 };
+        toast.current.show({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'La commande est prête',
+          life: 2000,
+        });
       }
       await patchOrder(id, data);
       setOrdersData((prevState) =>
@@ -163,49 +172,28 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
   const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
   const formattedHour = moment(order.date_order).format('HH:mm');
 
-  // État local pour stocker l'heure de création de la commande
+  // Nouvel état local pour stocker l'heure de début de la commande
   const [startTime, setStartTime] = useState(moment(order.date_order));
 
-  // État local pour suivre le temps écoulé en secondes (300 secondes = 5 minutes)
-  const [remainingSeconds, setRemainingSeconds] = useState(300);
+  // Nouvel état local pour suivre le temps restant en secondes (600 secondes = 10 minutes)
+  const [remainingSeconds, setRemainingSeconds] = useState(600);
 
-  // État local pour indiquer si le temps écoulé est affiché
-  const [timeElapsed, setTimeElapsed] = useState(false);
-  const [currentTime, setCurrentTime] = useState(moment());
-
-  // Utiliser useEffect pour mettre à jour le temps restant et le temps écoulé chaque seconde
+  // Utiliser useEffect pour mettre à jour le temps restant chaque seconde
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTime(moment());
       setRemainingSeconds((prevRemainingSeconds) => {
         if (prevRemainingSeconds > 0) {
           return prevRemainingSeconds - 1;
         } else {
-          // Quand le temps est écoulé, afficher "Temps écoulé"
-          setTimeElapsed(true);
+          // Quand le temps est écoulé, afficher le message
+          console.log('Temps de préparation de 10min dépassé');
+          return 0;
         }
       });
     }, 1000);
 
     return () => clearInterval(intervalId);
   }, []);
-
-  // Fonction pour calculer le temps écoulé en fonction de l'heure actuelle
-  const getElapsedTime = () => {
-    const elapsedDuration = moment.duration(currentTime.diff(startTime));
-    const hours = elapsedDuration.hours();
-    const minutes = elapsedDuration.minutes();
-    const seconds = elapsedDuration.seconds();
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  // Fonction pour afficher le temps écoulé
-  const renderElapsedTime = () => {
-    const elapsedTime = getElapsedTime();
-    return `Temps écoulé ${elapsedTime}`;
-  };
 
   // Fonction pour afficher le compteur avec les minutes et les secondes restantes
   const renderTimeRemaining = () => {
@@ -222,21 +210,18 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
 
   // Fonction pour vérifier si le temps est écoulé
   const isTimeElapsed = () => {
-    const elapsedSeconds = currentTime.diff(startTime, 'seconds');
-    return elapsedSeconds >= 300; // 300 secondes = 5 minutes
+    const elapsedSeconds = moment().diff(startTime, 'seconds');
+    return elapsedSeconds >= 600; // 600 secondes = 10 minutes
   };
 
-  // Mise à jour de l'heure actuelle toutes les secondes
+  // Mise à jour de l'heure de début de commande lorsqu'elle est disponible
   useEffect(() => {
-    const timerId = setInterval(() => {
-      setCurrentTime(moment());
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
+    setStartTime(moment(order.date_order));
+  }, [order.date_order]);
 
   return (
     <Card sx={{ margin: 2, padding: 0 }}>
+      <Toast ref={toast} />
       <CardContent sx={{ padding: 0, paddingBottom: 0 }}>
         <Box>
           <Box
@@ -256,10 +241,10 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
             />
             <Typography sx={{ marginLeft: '10px' }}>
               {isTimeElapsed()
-                ? renderElapsedTime()
-                : timeElapsed
-                ? '+' + renderElapsedTime()
-                : renderTimeRemaining()}
+                ? 'Temps de préparation de 10min dépassé'
+                : remainingSeconds > 0
+                ? renderTimeRemaining()
+                : ''}
             </Typography>
           </Box>
           <Box
