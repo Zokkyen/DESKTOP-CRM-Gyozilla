@@ -50,6 +50,16 @@ export default function CrudEmployee() {
     });
   }, [reload]);
 
+  const formContainerStyles = {
+    maxHeight: '500px',
+    overflowY: 'auto',
+    padding: '1em',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    margin: '1em 0',
+    alignSelf: 'center',
+  };
+
   // Mise en place du scroll pour le CRUD
   const ScrollCrud = () => {
     return (
@@ -58,17 +68,38 @@ export default function CrudEmployee() {
           overflow: 'auto',
           width: '110%',
           height: '600px',
-          marginTop: 100,
+          marginTop: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '20%',
+            marginBottom: 30,
+          }}
+        >
+          <div className="formContainerStyles">
+            {createForm}
+            {editForm}
+          </div>
+        </div>
         <div className="card">
           <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
-            <Column field="id" header="Id" style={{ color: 'green' }}></Column>
+            <Column
+              field="id"
+              header="Id"
+              style={{ color: 'blue', fontWeight: 'bold' }}
+            ></Column>
             <Column field="lastname" header="Nom"></Column>
             <Column field="firstname" header="Prénom"></Column>
             <Column
               field="id_roles"
-              style={{ color: 'blue' }}
+              style={{ color: 'green', fontWeight: 'bold' }}
               header="Rôle"
               body={roleTemplate}
             ></Column>
@@ -78,6 +109,15 @@ export default function CrudEmployee() {
             <Column header="Supprimer" body={deleteButtonTemplate}></Column>
           </DataTable>
         </div>
+
+        <IconButton onClick={handleShowCreateForm}>
+          <AddCircleIcon
+            style={{ color: 'blue', fontSize: '40', alignSelf: 'center' }}
+          />{' '}
+        </IconButton>
+        <span style={{ color: 'blue', fontWeight: 'bold', fontSize: 20 }}>
+          Ajouter un employé
+        </span>
       </div>
     );
   };
@@ -261,138 +301,165 @@ export default function CrudEmployee() {
   // ------------------------------------------------------
 
   // Formulaire de création
+
   const createForm = showCreateForm && (
     <div>
       <h2>Créer un nouvel employé</h2>
-      <div
-        className="inputForm"
-        style={{
-          flexWrap: 'wrap',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <input
-          placeholder="Nom"
-          type="text"
-          name="lastname"
-          value={formData.lastname}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Prénom"
-          type="text"
-          name="firstname"
-          value={formData.firstname}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Rôle"
-          type="text"
-          name="id_roles"
-          value={formData.id_roles}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Email"
-          type="text"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Téléphone"
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-        />
-        <Button
-          icon="pi pi-times"
-          rounded={true}
-          severity="danger"
-          aria-label="Créer"
-          variant="contained"
-          color="secondary"
-          style={{ backgroundColor: 'green', color: 'white' }}
-          onClick={handleCreateEmployee}
-        >
-          Enregistrer
-        </Button>
-      </div>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="lastname"
+            label="Nom"
+            fullWidth
+            variant="outlined"
+            value={formData.lastname}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="firstname"
+            label="Prénom"
+            fullWidth
+            variant="outlined"
+            value={formData.firstname}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="id_roles"
+            label="Rôle"
+            fullWidth
+            variant="outlined"
+            value={formData.id_roles}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="email"
+            label="Email"
+            fullWidth
+            variant="outlined"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="phone"
+            label="Téléphone"
+            fullWidth
+            variant="outlined"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleCreateEmployee}
+          >
+            Enregistrer
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   );
   // ------------------------------------------------------
 
   // Formulaire de modification
+
   const editForm = showEditForm && (
     <div>
       <h2>Modifier l'employé</h2>
-      <div
-        className="inputForm"
-        style={{
-          flexWrap: 'wrap',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <input
-          placeholder="Nom"
-          type="text"
-          name="lastname"
-          value={formData.lastname}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Prénom"
-          type="text"
-          name="firstname"
-          value={formData.firstname}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Rôle"
-          type="text"
-          name="id_roles"
-          value={formData.id_roles}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Email"
-          type="text"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          placeholder="Téléphone"
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-        />
-        <Button
-          icon="pi pi-times"
-          rounded={true}
-          severity="danger"
-          aria-label="Modifier"
-          variant="contained"
-          color="secondary"
-          style={{ backgroundColor: 'green', color: 'white' }}
-          onClick={() => handleEditEmployee(formData.id, formData)}
-        >
-          Enregistrer
-        </Button>
-      </div>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="lastname"
+            label="Nom"
+            fullWidth
+            variant="outlined"
+            value={formData.lastname}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="firstname"
+            label="Prénom"
+            fullWidth
+            variant="outlined"
+            value={formData.firstname}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="id_roles"
+            label="Rôle"
+            fullWidth
+            variant="outlined"
+            value={formData.id_roles}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="email"
+            label="Email"
+            fullWidth
+            variant="outlined"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="phone"
+            label="Téléphone"
+            fullWidth
+            variant="outlined"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={() => handleEditEmployee(formData.id, formData)}
+          >
+            Enregistrer
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   );
   // ------------------------------------------------------
 
   return (
-    <div style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <ScrollCrud />
-      {createForm}
-      {editForm}
       {deleteConfirmDialog}
       {/* <Button
         style={{
@@ -407,14 +474,6 @@ export default function CrudEmployee() {
       >
         Créer un nouvel employé
       </Button> */}
-      <IconButton onClick={handleShowCreateForm}>
-        <AddCircleIcon
-          style={{ color: 'blue', fontSize: '40', alignSelf: 'center' }}
-        />{' '}
-      </IconButton>
-      <span style={{ color: 'blue', fontWeight: 'bold', fontSize: 20 }}>
-        Ajouter un employé
-      </span>
     </div>
   );
 }
