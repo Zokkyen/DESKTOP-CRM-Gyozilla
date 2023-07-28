@@ -14,6 +14,7 @@ import {
   getCustomerFromOrder,
   getOrderLinesByOrderId,
   patchOrder,
+  getProductsById,
 } from 'renderer/utils/api-call/order';
 
 // Import des icônes
@@ -31,7 +32,7 @@ import { io } from 'socket.io-client';
 import { Toast } from 'primereact/toast';
 
 // Composant pour afficher une "card" d'order
-function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
+function OrderCard({ order, setOrdersData }) {
   const toast = useRef(null);
 
   const getOrderTypeLabel = (orderTypeId) => {
@@ -129,95 +130,62 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
     }
   };
 
-  const [orderLinesData, setOrderLinesData] = useState([]);
-  const customer = customerData
-    ? customerData.find((customer) => customer.id === order.id_customers)
-    : null;
-
-  const getCustomerName = () => {
-    if (!customer) return 'N/A';
-    const firstName = customer.firstname || '';
-    const lastNameInitial = customer.lastname
-      ? customer.lastname.charAt(0) + '.'
-      : '';
-    return `${firstName} ${lastNameInitial}`;
-  };
-  const getOrderLines = async (orderLinesId) => {
-    try {
-      const response = await getOrderLinesByOrderId(orderLinesId);
-      setOrderLinesData(response.data);
-    } catch (error) {
-      console.error(
-        'Erreur lors de la récupération des lignes de commande :',
-        error
-      );
-    }
-  };
-  useEffect(() => {
-    const fetchOrderLines = async () => {
-      try {
-        const response = await getOrderLinesByOrderId(order.id);
-        setOrderLinesData(response.data);
-      } catch (error) {
-        console.error(
-          'Erreur lors de la récupération des lignes de commande :',
-          error
-        );
-      }
-    };
-
-    fetchOrderLines();
-  }, []);
-
   const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
   const formattedHour = moment(order.date_order).format('HH:mm');
+  const currentHour = moment().format('HH:mm');
 
   // Nouvel état local pour stocker l'heure de début de la commande
-  const [startTime, setStartTime] = useState(moment(order.date_order));
+  const [elapsedTime, setElapsedTime] = useState('');
+  var minutes;
+  var seconds;
 
-  // Nouvel état local pour suivre le temps restant en secondes (600 secondes = 10 minutes)
-  const [remainingSeconds, setRemainingSeconds] = useState(600);
+  // Utiliser une référence pour l'intervalle
+  const intervalRef = useRef(null);
 
-  // Utiliser useEffect pour mettre à jour le temps restant chaque seconde
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setRemainingSeconds((prevRemainingSeconds) => {
-        if (prevRemainingSeconds > 0) {
-          return prevRemainingSeconds - 1;
-        } else {
-          // Quand le temps est écoulé, afficher le message
-          console.log('Temps de préparation de 10min dépassé');
-          return 0;
-        }
-      });
+    // Vérifier si order.date_order est supérieur à moment() avant de démarrer l'intervalle
+    if (moment(order.date_order).isAfter(moment())) {
+      return; // Ne rien faire si order.date_order est supérieur à moment()
+    }
+    // Créer l'intervalle
+    intervalRef.current = setInterval(() => {
+      let time = moment().diff(moment(order.date_order));
+      // Conversion en minutes et secondes
+      var duration = moment.duration(time);
+      minutes = duration.minutes();
+      seconds = duration.seconds();
+
+      setElapsedTime(minutes + ':' + seconds);
+
+      // Arrêter l'intervalle si le temps de préparation atteint 15 minutes
+      if (minutes >= 15) {
+        clearInterval(intervalRef.current);
+
+        setElapsedTime('delai de preparation depassé');
+      }
     }, 1000);
 
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Fonction pour afficher le compteur avec les minutes et les secondes restantes
-  const renderTimeRemaining = () => {
-    if (remainingSeconds > 0) {
-      const minutes = Math.floor(remainingSeconds / 60);
-      const seconds = remainingSeconds % 60;
-      return `${minutes.toString().padStart(2, '0')}:${seconds
-        .toString()
-        .padStart(2, '0')}`;
-    } else {
-      return ''; // Le compteur est à zéro, on n'affiche rien
-    }
-  };
-
-  // Fonction pour vérifier si le temps est écoulé
-  const isTimeElapsed = () => {
-    const elapsedSeconds = moment().diff(startTime, 'seconds');
-    return elapsedSeconds >= 600; // 600 secondes = 10 minutes
-  };
-
-  // Mise à jour de l'heure de début de commande lorsqu'elle est disponible
-  useEffect(() => {
-    setStartTime(moment(order.date_order));
+    // Nettoyer l'intervalle lorsqu'un nouveau composant est monté ou démonté
+    return () => {
+      clearInterval(intervalRef.current);
+    };
   }, [order.date_order]);
+
+  // const iconElapsedColor = elapsedTime ? 'red' : 'black';
+  let iconElapsedColor = 'black';
+
+  if (elapsedTime) {
+    const minutesValue = parseInt(elapsedTime.split(':')[0]);
+    if (minutesValue >= 10) {
+      iconElapsedColor = 'red';
+    }
+  }
+  if (elapsedTime === 'delai de preparation depassé') {
+    iconElapsedColor = 'red';
+  }
+
+  const productInOrders = order.order_lines[0].products;
+  console.log('order.order_lines', order.order_lines[0].products);
 
   return (
     <Card sx={{ margin: 2, padding: 0 }}>
@@ -237,15 +205,9 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
               {formattedHour}
             </Typography>
             <NotificationsActiveIcon
-              sx={{ marginLeft: '35px', color: 'red' }}
+              sx={{ marginLeft: '35px', color: iconElapsedColor }}
             />
-            <Typography sx={{ marginLeft: '10px' }}>
-              {isTimeElapsed()
-                ? 'Temps de préparation de 10min dépassé'
-                : remainingSeconds > 0
-                ? renderTimeRemaining()
-                : ''}
-            </Typography>
+            <Typography sx={{ marginLeft: '10px' }}>{elapsedTime}</Typography>
           </Box>
           <Box
             sx={{
@@ -277,13 +239,20 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
             </Button>
             <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
 
-            <Typography>{customer ? getCustomerName() : 'N/A'}</Typography>
+            <Typography>
+              {!order.customers
+                ? 'N/A'
+                : order.customers.firstname +
+                  ' ' +
+                  order.customers.lastname.charAt(0) +
+                  '.'}
+            </Typography>
           </Box>
 
           <Box sx={{ padding: 1 }}>
-            <Typography>
-              Order Lines : {orderLinesData.map((line) => line.name).join(', ')}
-            </Typography>
+            <Typography>{order.order_lines[0].products.name}</Typography>
+            <Typography></Typography>
+            <Typography></Typography>
 
             <Typography>Prix : {order.total_price}€</Typography>
           </Box>
@@ -324,19 +293,12 @@ function OrderCard({ order, setOrdersData, setOrderLines, customerData }) {
 function OrdersPage() {
   // État pour stocker les données des orders
   const [ordersData, setOrdersData] = useState([]);
-  const [orderLines, setOrderLines] = useState([]);
-  const [customerData, setCustomerData] = useState(null);
 
   // Récupère les orders depuis la base de données
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
         const response = await getAllOrdersByFranchise(1);
-        // Mettez à jour l'état avec les données récupérées
-        // Stocke l'heure de création de la première commande
-        if (ordersData.length > 0) {
-          setStartTime(moment(exampleOrdersData[0].date_order));
-        }
         setOrdersData(response.data.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des orders :', error);
@@ -349,21 +311,7 @@ function OrdersPage() {
     //   console.log('nouvelleDonnées');
     // });
   }, []);
-
-  useEffect(() => {
-    const fetchCustomerData = async (customerId) => {
-      try {
-        const customer = await getCustomerFromOrder(customerId);
-        setCustomerData(customer);
-      } catch (error) {
-        console.error('Erreur lors de la récupération du client :', error);
-        setCustomerData(null);
-      }
-    };
-    ordersData.forEach((order) => {
-      fetchCustomerData(order.id_customers);
-    });
-  }, []);
+  console.log('ordersData', ordersData);
 
   // Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(
@@ -383,11 +331,7 @@ function OrdersPage() {
       <Grid container spacing={2}>
         {paidOrders.map((order) => (
           <Grid item xs={12} sm={6} md={4} key={order.id}>
-            <OrderCard
-              order={order}
-              setOrdersData={setOrdersData}
-              customerData={customerData}
-            />
+            <OrderCard order={order} setOrdersData={setOrdersData} />
           </Grid>
         ))}
       </Grid>
