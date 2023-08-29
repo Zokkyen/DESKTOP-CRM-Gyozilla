@@ -4,10 +4,11 @@ import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
-import CrudStock from './crudStock/CrudStock';
 import Profile from './profile/Profile';
 import Home from './home/Home';
 import Ca from './ca/Ca';
+import CrudIngredient from './crudIngredient/CrudIngredient';
+import CrudStock from './crudStock/CrudStock';
 
 const arrayNavigation = [
   {
@@ -36,6 +37,13 @@ const arrayNavigation = [
     icon: <RamenDiningIcon />,
     component: {
       callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
+    },
+  },
+  {
+    label: 'Ingrédients',
+    icon: <InventoryIcon />,
+    component: {
+      callback: ({ callback }) => <CrudIngredient onLinkClick={callback} />,
     },
   },
   {
