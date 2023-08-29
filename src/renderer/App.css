@@ -61,3 +61,11 @@ a:hover {
   align-items: center;
   margin: 20px 0;
 }
+
+body {
+  overflow: auto;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}

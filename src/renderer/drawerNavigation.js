@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeIcon from '@mui/icons-material/Home';
@@ -13,6 +14,7 @@ const arrayNavigation = [
   {
     label: 'Accueil',
     icon: <HomeIcon />,
+    roles: [1, 2, 3, 4],
     component: {
       callback: ({ callback }) => <Home onLinkClick={callback} />,
     },
@@ -20,6 +22,7 @@ const arrayNavigation = [
   {
     label: 'CA',
     icon: <TrendingUpIcon />,
+    roles: [2, 4],
     component: {
       callback: ({ callback }) => <Ca onLinkClick={callback} />,
     },
@@ -27,6 +30,7 @@ const arrayNavigation = [
   {
     label: 'Profil',
     icon: <AccountCircleIcon />,
+    roles: [1, 2, 4],
     component: {
       callback: ({ callback }) => <Profile onLinkClick={callback} />,
     },
@@ -34,6 +38,7 @@ const arrayNavigation = [
   {
     label: 'Produits',
     icon: <RamenDiningIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
     },
@@ -41,10 +46,15 @@ const arrayNavigation = [
   {
     label: 'Stock',
     icon: <InventoryIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudStock onLinkClick={callback} />,
     },
   },
 ];
+
+export const getNavigationItemsForRole = (role) => {
+  return arrayNavigation.filter((item) => item.roles.includes(role));
+};
 
 export default arrayNavigation;
