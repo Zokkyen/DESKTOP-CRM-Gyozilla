@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://api.gyozilla-restaurants.fr/api/',
-  // baseURL: 'https://localhost:4000/',
+  // baseURL: 'https://api.gyozilla-restaurants.fr/api/',
+  baseURL: 'http://localhost:4000/api/',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
