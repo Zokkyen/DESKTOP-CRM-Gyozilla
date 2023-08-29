@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './crudStock.css'
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -25,14 +26,12 @@ import { getStockByFranchise } from 'renderer/utils/api-call/getStockByFranchise
 import { deleteStockById } from 'renderer/utils/api-call/deleteStockById';
 import { updateStocktById } from 'renderer/utils/api-call/updateStockById';
 import { createdStock } from 'renderer/utils/api-call/createdStock';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Dropdown } from "primereact/dropdown";
 
 const CrudStock = () => {
     const emptyStock = {
-        ingredient: '',
+        id_franchises: '',
+        id_ingredients: '',
         quantity: '',
     };
     const [ingredients, setIngredients] = useState(null);
@@ -64,7 +63,7 @@ const CrudStock = () => {
     getAllIngredients()
     .then((res)=>{
         if (res.data) {
-            console.log(res.data);
+
         setIngredients(res.data);
         }
     }).finally(()=>{
@@ -73,11 +72,10 @@ const CrudStock = () => {
     }, [isLoad])
     
     const validationSchema = Yup.object().shape({
-    name: Yup.string()
-        .required("Le libellé est obligatoire"),
-    quantity: Yup.number()
-        .positive("La quantité ne peut être inférieur à 0€")
-        .required("La quantité est obligatoire"),
+        id_ingredients: Yup.number()
+            .required("L\'ingrédient est obligatoire"),
+        quantity: Yup.number()
+            .required("La quantité est obligatoire"),
     });
 
     
@@ -103,13 +101,14 @@ const CrudStock = () => {
     const saveStock = (values,id) => {
         const _stock = { ...values };
         if (id) {
+            console.log(_stock);
             updateStocktById(_stock, id)
         .then((res)=>{
         if (res.data.message === 'Mis à jour') {
             toast.current.show({
             severity: 'success',
             summary: 'Successful',
-            detail: 'L\'ingredient a été mis à jour',
+            detail: 'Le stock a été mis à jour',
             life: 3000
             });
             setStockDialog(false);
@@ -119,7 +118,7 @@ const CrudStock = () => {
         toast.current.show({
             severity: 'danger',
             summary: 'Error',
-            detail: 'L\'ingredient n\'a pas été mis à jour',
+            detail: 'Le stock n\'a pas été mis à jour',
             life: 3000
         });
         });
@@ -130,7 +129,7 @@ const CrudStock = () => {
             toast.current.show({
             severity: 'success',
             summary: 'Successful',
-            detail: 'L\ingredient a bien été ajouté',
+            detail: 'L\'element a bien été ajouté',
             life: 3000
             });
             setStockDialog(false);
@@ -140,7 +139,7 @@ const CrudStock = () => {
         toast.current.show({
             severity: 'danger',
             summary: 'Error',
-            detail: 'L\'ingredient n\'a pas été ajouté',
+            detail: 'L\'element n\'a pas été ajouté',
             life: 3000
         });
         });
@@ -167,7 +166,7 @@ const CrudStock = () => {
             toast.current.show({
             severity: 'success',
             summary: 'Successful',
-            detail: 'L\'ingredient a été supprimé',
+            detail: 'L\'element a été supprimé',
             life: 3000
             });
         }
@@ -175,7 +174,7 @@ const CrudStock = () => {
         toast.current.show({
             severity: 'danger',
             summary: 'Error',
-            detail: 'L\'ingredient n\'a pas été supprimé',
+            detail: 'L\'element du stock n\'a pas été supprimé',
             life: 3000
         });
         })
@@ -225,7 +224,7 @@ const CrudStock = () => {
             toast.current.show({
             severity: 'success',
             summary: 'Successful',
-            detail: 'Ingredient(s) supprimé(s)',
+            detail: 'Les lignes du stock ont été supprimé',
             life: 3000
             });
         } else {
@@ -328,52 +327,57 @@ const CrudStock = () => {
             <Dialog visible={stockDialog} style={{ width: '32rem', zIndex: 9999}} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Détails du stock" modal className="p-fluid" onHide={hideDialog}>
             <Formik
                 initialValues={{
-                    ingredient: stock.ingredient,
+                    id_franchises : id,
+                    id_ingredients: stock.id_ingredients,
                     quantity: stock.quantity,
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values)=>{
-                saveStock(values, stock.id)
+                saveStock(values,stock.id)
                 }}
             >
                 {({ values, handleChange,handleSubmit, errors, touched, isSubmitting, setFieldValue}) => {
+                    console.log(errors);
                 return (
                     <Form>
-                    <FormControl variant="standard" sx={{ minWidth: 120 }}>
-                    <InputLabel id="ingredient">Ingrédient</InputLabel>
-                    <Select
-                    labelId="ingredient"
-                    id="ingredient"
-                    label="Ingrédient"
-                    value={values.ingredient}
-                    onChange={(event) => setFieldValue('ingredient', event.target.value)} 
-                    >  
-                    {ingredients ?
-                    ingredients.map((ingredient)=>(
-                        <MenuItem value={ingredient.id}>{ingredient.name}</MenuItem>
-                    ))
-                    :
-                    'Impossible de récupérer les ingrédients'
-                    }   
-                    </Select>
-                </FormControl>
-                    <TextField
-                        value={values.quantity} 
-                        onChange={handleChange}
-                        label="Quantité"
-                        id="quantity"
-                        name='quantity'
-                        type='number'
-                        sx={{ m: 1, width: "100%" }}
-                        InputProps={{
-                        inputProps: { min: 0 }
-                        }}
-                    />
-                    <ErrorMessage name="quantity" />
-                    <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
-                    <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
-                    <Button style={{backgroundColor: '#4f7170', border: '1px solid #4f7170'}} label="Sauvegarder" type='submit' icon="pi pi-check" onClick={handleSubmit}/>
-                    </Box>
+                        <TextField
+                            value={values.id_franchises} 
+                            id="id_franchises"
+                            name='id_franchises'
+                            type='hidden'
+                            style={{ display: 'none' }}
+                        />
+                        <Dropdown
+                            style={{marginLeft: 9, width: "100%"}}
+                            filter
+                            inputId="id_ingredients"
+                            name="id_ingredients"
+                            value={ingredients.find(id_ingredients => id_ingredients.id === values.id_ingredients)} // Utilisez find pour obtenir l'objet complet basé sur l'ID
+                            options={ingredients}
+                            optionLabel="name"
+                            placeholder='Choisir un ingrédient'
+                            onChange={(e) => {
+                                setFieldValue("id_ingredients", e.value.id);
+                            }}
+                        />
+                        <ErrorMessage name="id_ingredients" />
+                        <TextField
+                            value={values.quantity} 
+                            onChange={handleChange}
+                            label="Quantité"
+                            id="quantity"
+                            name='quantity'
+                            type='number'
+                            sx={{ m: 1, width: "100%" }}
+                            InputProps={{
+                            inputProps: { min: 0 }
+                            }}
+                        />
+                        <ErrorMessage name="quantity" />
+                        <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: '10px'}}>
+                        <Button style={{marginRight: '10px', color: '#4f7170', border: '1px solid #4f7170'}} label="Annuler" icon="pi pi-times" outlined onClick={hideDialog} />
+                        <Button style={{backgroundColor: '#4f7170', border: '1px solid #4f7170'}} label="Sauvegarder" type='submit' icon="pi pi-check" onClick={handleSubmit}/>
+                        </Box>
                     </Form>
                 );
                 }}

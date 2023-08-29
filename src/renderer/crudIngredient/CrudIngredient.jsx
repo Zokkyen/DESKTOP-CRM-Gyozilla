@@ -258,25 +258,6 @@ const priceBodyTemplate = (rowData) => {
     return formatCurrency(rowData.purchasePrice);
 };
 
-// const quantityBodyTemplate = (rowData) => {
-//   if (rowData.quantity > 100) {
-//     return <Badge value={rowData.quantity} severity="success"></Badge>;
-// } else if (rowData.quantity > 0 && rowData.quantity < 100) {
-//     return <Badge value={rowData.quantity} severity="warning"></Badge>;
-// } else {
-//     return <Badge value={rowData.quantity} severity="danger"></Badge>;
-// }
-// };
-
-// const statusBodyTemplate = (rowData) => {
-//   if (rowData.quantity > 100) {
-//     return <Tag value="En Stock" icon="pi pi-check" severity="success"></Tag>;
-//   } else if (rowData.quantity > 0 && rowData.quantity < 100) {
-//     return <Tag value="Stock bas" icon="pi pi-exclamation-triangle" severity="warning"></Tag>;
-//   } else {
-//     return <Tag value="Stock épuisé" icon="pi pi-times" severity="danger"></Tag>;
-//   }
-// };
 
 const actionBodyTemplate = (rowData) => {
     return (
@@ -311,8 +292,6 @@ return (
                 <Column field="code" header="Code" body={codeBodyTemplate}  sortable style={{ minWidth: '12rem' }}></Column>
                 <Column field="name" header="Libelle" body={labelBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>
                 <Column field="purchasePrice" header="Prix" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                {/* <Column field="quantity" header="Quantité" body={quantityBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
-                {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
             </DataTable>
         </div>
