@@ -1,0 +1,9 @@
+@keyframes alarm {
+  0%,
+  100% {
+    transform: rotate(-35deg);
+  }
+  50% {
+    transform: rotate(35deg); /* ou toute autre valeur pour l'effet désiré */
+  }
+}
