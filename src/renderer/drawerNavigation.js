@@ -62,7 +62,9 @@ const arrayNavigation = [
 ];
 
 export const getNavigationItemsForRole = (role) => {
-  return arrayNavigation.filter((item) => item.roles.includes(role));
+  return arrayNavigation.filter((item) => {
+    return item.roles ? item.roles.includes(role) : false;
+  });
 };
 
 export default arrayNavigation;

@@ -121,9 +121,9 @@ export default function HomeDrawer() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <CssBaseline />
-      <AppBar position="fixed">
+      <AppBar position="fixed" sx={{ height: '10vh' }}>
         <Toolbar
           style={{
             display: 'flex',
@@ -216,7 +216,7 @@ export default function HomeDrawer() {
         </List>
       </Drawer>
       <TabContext.Provider value={selectedTab}>
-        <Main open={open}>
+        <Main open={open} sx={{ minHeight: '90vh', marginTop: '10vh' }}>
           {mainContent || selectedItem.component.callback({ callback })}
         </Main>
       </TabContext.Provider>

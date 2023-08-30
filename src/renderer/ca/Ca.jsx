@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable consistent-return */
 /* eslint-disable default-case */
@@ -9,31 +11,31 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable no-console */
 /* eslint-disable import/no-cycle */
-import React, { useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+// import PropTypes from 'prop-types';
 
 import {
-  alpha,
+  // alpha,
   Box,
   Button,
-  Checkbox,
-  IconButton,
+  // Checkbox,
+  // IconButton,
   MenuItem,
-  Paper,
+  // Paper,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TableSortLabel,
-  Toolbar,
+  // Table,
+  // TableBody,
+  // TableCell,
+  // TableContainer,
+  // TableHead,
+  // TablePagination,
+  // TableRow,
+  // TableSortLabel,
+  // Toolbar,
   Typography,
 } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
-import FilterListIcon from '@mui/icons-material/FilterList';
+// import { visuallyHidden } from '@mui/utils';
+// import FilterListIcon from '@mui/icons-material/FilterList';
 
 import {
   startOfMonth,
@@ -61,10 +63,12 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
-import { Tooltip } from 'primereact/tooltip';
+// import { Tooltip } from 'primereact/tooltip';
 import { UserContext } from '../utils/context/UserContext';
-import { TabContext } from '../drawer/HomeDrawer';
+// import { TabContext } from '../drawer/HomeDrawer';
+import './Ca.css';
 import { getAllOrdersByFranchise } from '../utils/api-call/getAllOrdersByFranchise';
+import { getAllExpenses } from '../utils/api-call/expenses';
 
 ChartJS.register(
   CategoryScale,
@@ -192,154 +196,155 @@ function groupByPeriod(period, data, selectedDate) {
   return { labels, datasets: [datasetRevenue, datasetCount] };
 }
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+// function descendingComparator(a, b, orderBy) {
+//   if (b[orderBy] < a[orderBy]) {
+//     return -1;
+//   }
+//   if (b[orderBy] > a[orderBy]) {
+//     return 1;
+//   }
+//   return 0;
+// }
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
+// function getComparator(order, orderBy) {
+//   return order === 'desc'
+//     ? (a, b) => descendingComparator(a, b, orderBy)
+//     : (a, b) => -descendingComparator(a, b, orderBy);
+// }
 
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
+// function stableSort(array, comparator) {
+//   const stabilizedThis = array.map((el, index) => [el, index]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) {
+//       return order;
+//     }
+//     return a[1] - b[1];
+//   });
+//   return stabilizedThis.map((el) => el[0]);
+// }
 
-const headCells = [
-  {
-    id: 'date_order',
-    numeric: false,
-    disablePadding: true,
-    label: 'Date de la commande',
-  },
-  {
-    id: 'total_price',
-    numeric: true,
-    disablePadding: false,
-    label: 'Prix total',
-  },
-  {
-    id: 'status',
-    numeric: true,
-    disablePadding: false,
-    label: 'Status',
-  },
-  {
-    id: 'order_type',
-    numeric: true,
-    disablePadding: false,
-    label: 'Type',
-  },
-];
+// const headCells = [
+//   {
+//     id: 'date_order',
+//     numeric: false,
+//     disablePadding: true,
+//     label: 'Date de la commande',
+//   },
+//   {
+//     id: 'total_price',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Prix total',
+//   },
+//   {
+//     id: 'status',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Status',
+//   },
+//   {
+//     id: 'order_type',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Type',
+//   },
+// ];
 
-function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort } = props;
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+// function EnhancedTableHead(props) {
+//   const { order, orderBy, onRequestSort } = props;
+//   const createSortHandler = (property) => (event) => {
+//     onRequestSort(event, property);
+//   };
 
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="none" />
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
+//   return (
+//     <TableHead>
+//       <TableRow>
+//         <TableCell padding="none" />
+//         {headCells.map((headCell) => (
+//           <TableCell
+//             key={headCell.id}
+//             align={headCell.numeric ? 'right' : 'left'}
+//             padding={headCell.disablePadding ? 'none' : 'normal'}
+//             sortDirection={orderBy === headCell.id ? order : false}
+//           >
+//             <TableSortLabel
+//               active={orderBy === headCell.id}
+//               direction={orderBy === headCell.id ? order : 'asc'}
+//               onClick={createSortHandler(headCell.id)}
+//             >
+//               {headCell.label}
+//               {orderBy === headCell.id ? (
+//                 <Box component="span" sx={visuallyHidden}>
+//                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+//                 </Box>
+//               ) : null}
+//             </TableSortLabel>
+//           </TableCell>
+//         ))}
+//       </TableRow>
+//     </TableHead>
+//   );
+// }
 
-EnhancedTableHead.propTypes = {
-  onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
-};
+// EnhancedTableHead.propTypes = {
+//   onRequestSort: PropTypes.func.isRequired,
+//   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+//   orderBy: PropTypes.string.isRequired,
+// };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
+// function EnhancedTableToolbar(props) {
+//   const { numSelected } = props;
 
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      <Typography
-        sx={{ flex: '1 1 100%' }}
-        variant="hboxb"
-        id="tableTitle"
-        component="div"
-      >
-        Historique des commandes
-      </Typography>
+//   return (
+//     <Toolbar
+//       sx={{
+//         pl: { sm: 2 },
+//         pr: { xs: 1, sm: 1 },
+//         ...(numSelected > 0 && {
+//           bgcolor: (theme) =>
+//             alpha(
+//               theme.palette.primary.main,
+//               theme.palette.action.activatedOpacity
+//             ),
+//         }),
+//       }}
+//     >
+//       <Typography
+//         sx={{ flex: '1 1 100%' }}
+//         variant="hboxb"
+//         id="tableTitle"
+//         component="div"
+//       >
+//         Historique des commandes
+//       </Typography>
 
-      <Tooltip title="Filter list">
-        <IconButton>
-          <FilterListIcon />
-        </IconButton>
-      </Tooltip>
-    </Toolbar>
-  );
-}
+//       <Tooltip title="Filter list">
+//         <IconButton>
+//           <FilterListIcon />
+//         </IconButton>
+//       </Tooltip>
+//     </Toolbar>
+//   );
+// }
 
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
+// EnhancedTableToolbar.propTypes = {
+//   numSelected: PropTypes.number.isRequired,
+// };
 
 export default function Ca() {
   const [period, setPeriod] = useState('mois');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [data, setData] = useState(null);
+  const [allOrders, setAllOrders] = useState(null);
+  const [allExpenses, setAllExpenses] = useState(null);
   const { user } = useContext(UserContext);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('date_order');
-  const [selected, setSelected] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState([]);
-  const selectedTab = useContext(TabContext);
+  // const [order, setOrder] = useState('asc');
+  // const [orderBy, setOrderBy] = useState('date_order');
+  // const [selected, setSelected] = useState([]);
+  // const [page, setPage] = useState(0);
+  // const [rowsPerPage, setRowsPerPage] = useState(5);
+  // const [rows, setRows] = useState([]);
+  // const selectedTab = useContext(TabContext);
   const [isLoading, setIsLoading] = useState(true);
 
   const handlePrevClick = () => {
@@ -373,9 +378,23 @@ export default function Ca() {
             res.data.data,
             selectedDate
           );
-          setData({ labels, datasets });
+          setAllOrders({ labels, datasets });
         } else {
           console.log('res is not in expected format: ', res);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    getAllExpenses()
+      .then((res) => {
+        if (res) {
+          setAllExpenses(res.data.data);
+          setIsLoading(false);
+        } else {
+          console.log('res is not in expected format: ', res);
+          setIsLoading(false);
         }
       })
       .catch((error) => {
@@ -383,84 +402,84 @@ export default function Ca() {
       });
   }, [period, selectedDate, user.franchise]);
 
-  useEffect(() => {
-    getAllOrdersByFranchise(user.franchise)
-      .then((res) => {
-        if (res) {
-          const newRows = res.data.data.map((item) => {
-            return {
-              date_order: item.date_order,
-              total_price: item.total_price,
-              status: item.order_status.name,
-              order_type: item.order_type.name,
-            };
-          });
-          setRows(newRows);
-          setIsLoading(false);
-        } else {
-          console.log('res is not in expected format: ', res);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
-  }, [selectedTab, user.franchises]);
+  // useEffect(() => {
+  //   getAllOrdersByFranchise(user.franchise)
+  //     .then((res) => {
+  //       if (res) {
+  //         const newRows = res.data.data.map((item) => {
+  //           return {
+  //             date_order: item.date_order,
+  //             total_price: item.total_price,
+  //             status: item.order_status.name,
+  //             order_type: item.order_type.name,
+  //           };
+  //         });
+  //         setRows(newRows);
+  //         setIsLoading(false);
+  //       } else {
+  //         console.log('res is not in expected format: ', res);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       setIsLoading(false);
+  //     });
+  // }, [selectedTab, user.franchises]);
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (event, property) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
+  // const handleSelectAllClick = (event) => {
+  //   if (event.target.checked) {
+  //     const newSelected = rows.map((n) => n.name);
+  //     setSelected(newSelected);
+  //     return;
+  //   }
+  //   setSelected([]);
+  // };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
+  // const handleClick = (event, name) => {
+  //   const selectedIndex = selected.indexOf(name);
+  //   let newSelected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
+  //   if (selectedIndex === -1) {
+  //     newSelected = newSelected.concat(selected, name);
+  //   } else if (selectedIndex === 0) {
+  //     newSelected = newSelected.concat(selected.slice(1));
+  //   } else if (selectedIndex === selected.length - 1) {
+  //     newSelected = newSelected.concat(selected.slice(0, -1));
+  //   } else if (selectedIndex > 0) {
+  //     newSelected = newSelected.concat(
+  //       selected.slice(0, selectedIndex),
+  //       selected.slice(selectedIndex + 1)
+  //     );
+  //   }
 
-    setSelected(newSelected);
-  };
+  //   setSelected(newSelected);
+  // };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  // const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  // const emptyRows =
+  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const sortedRows = stableSort(rows, getComparator(order, orderBy));
-  const visibleRows = sortedRows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  // const sortedRows = stableSort(rows, getComparator(order, orderBy));
+  // const visibleRows = sortedRows.slice(
+  //   page * rowsPerPage,
+  //   page * rowsPerPage + rowsPerPage
+  // );*
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -471,17 +490,12 @@ export default function Ca() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignContent: 'center',
-        height: '100vh',
-        marginTop: '30vh',
       }}
     >
       <Typography
         variant="h6g"
         sx={{
-          // marginTop: '100px',
-          margin: '150px 0 50px 0',
+          marginBottom: '50px',
           textAlign: 'center',
         }}
       >
@@ -515,11 +529,16 @@ export default function Ca() {
           </Select>
         </Box>
         <Box sx={{ width: '100%' }}>
-          <Line options={getOptions(period, selectedDate)} data={data} />
+          <Line options={getOptions(period, selectedDate)} data={allOrders} />
         </Box>
       </Box>
 
-      <Box sx={{ width: '70vw', boxShadow: 'rgba(0, 0, 0, 0.30) 0px 3px 8px' }}>
+      {/* <Box
+        sx={{
+          width: '70vw',
+          boxShadow: 'rgba(0, 0, 0, 0.30) 0px 3px 8px',
+        }}
+      >
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar numSelected={selected.length} />
           <TableContainer>
@@ -592,7 +611,7 @@ export default function Ca() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
-      </Box>
+      </Box> */}
     </Box>
   );
 }
