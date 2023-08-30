@@ -9,7 +9,7 @@ function IconsTab({ tabValue, handleTabChange, ordersCounts }) {
     <Tabs
       value={tabValue}
       onChange={handleTabChange}
-      c
+      centered
       sx={{
         position: 'fixed',
         width: '100%',

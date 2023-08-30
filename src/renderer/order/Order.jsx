@@ -327,7 +327,7 @@ function OrderCard({ order, setOrdersData, toast }) {
         sx={{
           margin: 2,
           padding: '0px',
-          minHeight: '400px',
+          minHeight: '600px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -537,10 +537,12 @@ function OrdersPage() {
 
   return (
     <Box
-      style={{
-        width: '80vw',
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         height: '100%',
-        margin: '-24px',
+        position: 'relative',
       }}
     >
       <Toast ref={toast} />
@@ -552,21 +554,44 @@ function OrdersPage() {
         ordersCounts={ordersCounts}
       />
 
-      {/* Ajout d'un espace pour les onglets */}
-      <div style={{ height: '250px' }}></div>
-
-      {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
-      <Grid container spacing={2}>
-        {filteredOrders.map((order) => (
-          <Grid item xs={12} sm={6} md={3} key={order.id}>
-            <OrderCard
-              order={order}
-              setOrdersData={setOrdersData}
-              toast={toast}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1, // Ajuster la hauteur du contenu pour remplir l'espace disponible
+          paddingTop: '20px', // Ajouter de la marge en haut
+        }}
+      >
+        {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
+        <Grid
+          container
+          centered
+          spacing={1}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '200px',
+          }}
+        >
+          {filteredOrders.map((order) => (
+            <Grid
+              item
+              xs={12}
+              sm={3}
+              md={3}
+              key={order.id}
+              sx={{ marginTop: '20px' }} // Ajouter de la marge en haut de chaque carte
+            >
+              <OrderCard
+                order={order}
+                setOrdersData={setOrdersData}
+                toast={toast}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Box>
   );
 }
