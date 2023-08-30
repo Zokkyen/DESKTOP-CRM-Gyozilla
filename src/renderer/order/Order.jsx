@@ -1,3 +1,12 @@
+/* eslint-disable no-console */
+/* eslint-disable array-callback-return */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable radix */
+/* eslint-disable consistent-return */
+/* eslint-disable no-plusplus */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState, useRef } from 'react';
 import {
@@ -148,8 +157,8 @@ function OrderCard({ order, setOrdersData, toast }) {
 
   // Nouvel état local pour stocker l'heure de début de la commande
   const [elapsedTime, setElapsedTime] = useState('');
-  var minutes;
-  var seconds;
+  let minutes;
+  let seconds;
 
   const [zeroBlink, setZeroBlink] = useState(false);
 
@@ -179,7 +188,7 @@ function OrderCard({ order, setOrdersData, toast }) {
         const minutes = Math.floor(diffInSeconds / 60);
         const seconds = diffInSeconds % 60;
 
-        setElapsedTime(minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
+        setElapsedTime(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
 
         // Décrémenter le temps restant
         diffInSeconds--;
@@ -213,21 +222,21 @@ function OrderCard({ order, setOrdersData, toast }) {
 
   const productInOrders = order.order_lines[0].products;
   // console.log('order.order_lines', order.order_lines);
-  let result = [];
+  const result = [];
   let stopPlats = 0;
   let stopEntrees = 0;
   let stopDesserts = 0;
   let stopBoissons = 0;
 
-  //trier le tableau en fonction de product categories
+  // trier le tableau en fonction de product categories
   order.order_lines.sort(
     (a, b) =>
       a.products.id_product_categories - b.products.id_product_categories
   ); // Tri par id_product_categories
 
-  //boucle pour afficher les plats de la commande
+  // boucle pour afficher les plats de la commande
   order.order_lines.map((value, index) => {
-    //"stop" pour afficher le titre "plats" par exemple et ne plus l'afficher si plusieurs plats
+    // "stop" pour afficher le titre "plats" par exemple et ne plus l'afficher si plusieurs plats
     if (stopPlats === 0 && value.products.id_product_categories === 2) {
       result.push(
         <Typography
@@ -287,21 +296,19 @@ function OrderCard({ order, setOrdersData, toast }) {
     }
     if (stopBoissons === 0 && value.products.id_product_categories === 4) {
       result.push(
-        <>
-          <Typography
-            sx={{
-              marginTop: 3,
-              height: '3vh',
-              backgroundColor: 'rgba(160,160,160,0.4)',
-              alignItems: 'center',
-              display: 'flex',
-              fontWeight: 'bold',
-            }}
-          >
-            <LocalBarIcon sx={{ marginRight: '18px', color: 'black' }} />
-            Boissons
-          </Typography>
-        </>
+        <Typography
+          sx={{
+            marginTop: 3,
+            height: '3vh',
+            backgroundColor: 'rgba(160,160,160,0.4)',
+            alignItems: 'center',
+            display: 'flex',
+            fontWeight: 'bold',
+          }}
+        >
+          <LocalBarIcon sx={{ marginRight: '18px', color: 'black' }} />
+          Boissons
+        </Typography>
       );
       stopBoissons++;
     }
@@ -322,142 +329,139 @@ function OrderCard({ order, setOrdersData, toast }) {
   });
 
   return (
-    <>
-      <Card
-        sx={{
-          margin: 2,
-          padding: '0px',
-          minHeight: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Toast ref={toast} />
-        <CardContent sx={{ padding: 0 }}>
+    <Card
+      sx={{
+        margin: 2,
+        padding: '0px',
+        minHeight: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Toast ref={toast} />
+      <CardContent sx={{ padding: 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+          }}
+        >
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#f6a40055',
+            }}
+          >
+            <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
+            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
+              {formattedHour}
+            </Typography>
+            <NotificationsActiveIcon
+              sx={{
+                marginLeft: '35px',
+                color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                animation:
+                  elapsedTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
+              }}
+            />
+            {(order.id_status === 2 || order.id_status === 3) && (
+              <Typography
+                sx={{
+                  marginLeft: '10px',
+                  fontSize: elapsedTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
+                  color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                }}
+              >
+                {elapsedTime}
+              </Typography>
+            )}
+          </Box>
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#f6a40055',
+              padding: 1,
             }}
           >
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#f6a40055',
-              }}
-            >
-              <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
-              <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-                {formattedHour}
-              </Typography>
-              <NotificationsActiveIcon
-                sx={{
-                  marginLeft: '35px',
-                  color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
-                  animation:
-                    elapsedTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
-                }}
-              />
-              {(order.id_status === 2 || order.id_status === 3) && (
-                <Typography
-                  sx={{
-                    marginLeft: '10px',
-                    fontSize: elapsedTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
-                    color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
-                  }}
-                >
-                  {elapsedTime}
-                </Typography>
-              )}
-            </Box>
-            <Box
+            <Button
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: '#f6a40055',
-                padding: 1,
+                justifyContent: 'center',
+                width: '40%',
+                fontSize: '0.7rem',
+                borderRadius: '50px',
+                textTransform: 'none',
+                pointerEvents: 'none',
+                backgroundColor: getOrderTypeColor(order.id_order_types),
+                color: 'black',
               }}
             >
-              <Button
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40%',
-                  fontSize: '0.7rem',
-                  borderRadius: '50px',
-                  textTransform: 'none',
-                  pointerEvents: 'none',
-                  backgroundColor: getOrderTypeColor(order.id_order_types),
-                  color: 'black',
-                }}
-              >
-                {getOrderTypeIcon(order.id_order_types)}
-                {getOrderTypeLabel(order.id_order_types)}
-              </Button>
-              <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
+              {getOrderTypeIcon(order.id_order_types)}
+              {getOrderTypeLabel(order.id_order_types)}
+            </Button>
+            <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
 
-              <Typography>
-                {!order.customers
-                  ? 'N/A'
-                  : order.customers.firstname +
-                    ' ' +
-                    order.customers.lastname.charAt(0) +
-                    '.'}
-              </Typography>
-            </Box>
-            {/* Affichage des plats, desserts,... */}
-            <Box sx={{}}>
-              <>
-                {result.map((value, index) => (
-                  <Box key={index}>{value}</Box>
-                ))}
-              </>
-              <Typography sx={{ padding: 1, fontWeight: 'bold' }}>
-                Prix : {order.total_price}€
-              </Typography>
-            </Box>
+            <Typography>
+              {!order.customers
+                ? 'N/A'
+                : `${
+                    order.customers.firstname
+                  } ${order.customers.lastname.charAt(0)}.`}
+            </Typography>
           </Box>
-        </CardContent>
-        {/* BOX BUTTON */}
-        <Box
-          sx={{
-            justifyContent: 'flex-end',
-            alignSelf: 'center',
-            paddingBottom: 0,
-            margin: 2,
-          }}
-        >
-          {order.id_status === 2 ? (
-            <Button
-              sx={{ padding: '8px', fontSize: '0.7rem' }}
-              onClick={() => handleUpdateStatus(order.id)}
-            >
-              {' '}
-              <PlayArrowIcon sx={{ marginRight: '8px' }} />
-              Commencer la préparation
-            </Button>
-          ) : order.id_status === 3 ? (
-            <Button
-              sx={{ padding: '8px', fontSize: '0.7rem' }}
-              onClick={() => handleUpdateStatus(order.id)}
-            >
-              {' '}
-              <DoneIcon sx={{ marginRight: '8px' }} />
-              Marquer comme prête
-            </Button>
-          ) : null}
+          {/* Affichage des plats, desserts,... */}
+          <Box sx={{}}>
+            <>
+              {result.map((value, index) => (
+                <Box key={index}>{value}</Box>
+              ))}
+            </>
+            <Typography sx={{ padding: 1, fontWeight: 'bold' }}>
+              Prix : {order.total_price}€
+            </Typography>
+          </Box>
         </Box>
-      </Card>
-    </>
+      </CardContent>
+      {/* BOX BUTTON */}
+      <Box
+        sx={{
+          justifyContent: 'flex-end',
+          alignSelf: 'center',
+          paddingBottom: 0,
+          margin: 2,
+        }}
+      >
+        {order.id_status === 2 ? (
+          <Button
+            sx={{ padding: '8px', fontSize: '0.7rem' }}
+            onClick={() => handleUpdateStatus(order.id)}
+          >
+            {' '}
+            <PlayArrowIcon sx={{ marginRight: '8px' }} />
+            Commencer la préparation
+          </Button>
+        ) : order.id_status === 3 ? (
+          <Button
+            sx={{ padding: '8px', fontSize: '0.7rem' }}
+            onClick={() => handleUpdateStatus(order.id)}
+          >
+            {' '}
+            <DoneIcon sx={{ marginRight: '8px' }} />
+            Marquer comme prête
+          </Button>
+        ) : null}
+      </Box>
+    </Card>
   );
 }
 
@@ -553,7 +557,7 @@ function OrdersPage() {
       />
 
       {/* Ajout d'un espace pour les onglets */}
-      <div style={{ height: '250px' }}></div>
+      <Box style={{ height: '250px' }} />
 
       {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
       <Grid container spacing={2}>

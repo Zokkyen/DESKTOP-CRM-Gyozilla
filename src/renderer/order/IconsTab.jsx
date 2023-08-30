@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import { Tabs, Tab, Badge, Box } from '@mui/material';
+import { Tabs, Tab, Badge } from '@mui/material';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import DoneIcon from '@mui/icons-material/Done';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -9,7 +10,6 @@ function IconsTab({ tabValue, handleTabChange, ordersCounts }) {
     <Tabs
       value={tabValue}
       onChange={handleTabChange}
-      c
       sx={{
         position: 'fixed',
         width: '100%',

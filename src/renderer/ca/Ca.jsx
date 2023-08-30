@@ -379,14 +379,18 @@ export default function Ca() {
             selectedDate
           );
           setAllOrders({ labels, datasets });
+          setIsLoading(false);
         } else {
           console.log('res is not in expected format: ', res);
+          setIsLoading(false);
         }
       })
       .catch((error) => {
         console.log(error);
       });
+  }, [period, selectedDate, user.franchise]);
 
+  useEffect(() => {
     getAllExpenses()
       .then((res) => {
         if (res) {
@@ -400,7 +404,7 @@ export default function Ca() {
       .catch((error) => {
         console.log(error);
       });
-  }, [period, selectedDate, user.franchise]);
+  }, [allExpenses]);
 
   // useEffect(() => {
   //   getAllOrdersByFranchise(user.franchise)
