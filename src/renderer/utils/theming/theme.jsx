@@ -126,7 +126,6 @@ const theme = createTheme({
           marginTop: '3vh',
           transition: 'transform .2s',
           '&:hover': {
-            transform: 'scale(1.1)',
             color: '#FFFFFF',
             backgroundColor: '#212830',
             border: '1px solid #212830',

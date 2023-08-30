@@ -115,8 +115,14 @@ export default function HomeDrawer() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed">
-        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <AppBar>
+        <Toolbar
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            height: '10vh',
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"

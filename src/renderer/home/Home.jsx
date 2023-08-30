@@ -108,7 +108,6 @@ function Home({ onLinkClick }) {
         </Grid>
       </Grid>
       {/* <CrudEmployee></CrudEmployee> */}
-      <OrdersPage />
     </Box>
   );
 }

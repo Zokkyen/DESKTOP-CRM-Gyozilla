@@ -28,13 +28,18 @@ import DoneIcon from '@mui/icons-material/Done';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import LocalBarIcon from '@mui/icons-material/LocalBar';
+import RamenDiningIcon from '@mui/icons-material/RamenDining';
+import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
+import RoomServiceIcon from '@mui/icons-material/RoomService';
+import CookieIcon from '@mui/icons-material/Cookie';
 import { io } from 'socket.io-client';
 import { Toast } from 'primereact/toast';
+import IconsTab from './IconsTab';
 
+import './Order.css';
 // Composant pour afficher une "card" d'order
-function OrderCard({ order, setOrdersData }) {
-  const toast = useRef(null);
-
+function OrderCard({ order, setOrdersData, toast }) {
   const getOrderTypeLabel = (orderTypeId) => {
     switch (orderTypeId) {
       case 1:
@@ -107,15 +112,21 @@ function OrderCard({ order, setOrdersData }) {
     try {
       let data;
       if (order.id_status === 2) {
-        data = { id_status: 3 };
-      } else if (order.id_status === 3) {
-        data = { id_status: 4 };
         toast.current.show({
           severity: 'success',
-          summary: 'Successful',
-          detail: 'La commande est prête',
-          life: 2000,
+          summary: "C'est parti",
+          detail: 'Commande en cours de préparation',
+          life: 3000,
         });
+        data = { id_status: 3 };
+      } else if (order.id_status === 3) {
+        toast.current.show({
+          severity: 'success',
+          summary: 'Yes',
+          detail: 'La commande est prête',
+          life: 3000,
+        });
+        data = { id_status: 4 };
       }
       await patchOrder(id, data);
       setOrdersData((prevState) =>
@@ -139,37 +150,52 @@ function OrderCard({ order, setOrdersData }) {
   var minutes;
   var seconds;
 
+  const [zeroBlink, setZeroBlink] = useState(false);
+
   // Utiliser une référence pour l'intervalle
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    // Vérifier si order.date_order est supérieur à moment() avant de démarrer l'intervalle
+    // Vérifier si order.date_order est supérieur à moment() avant de démarrer le compte à rebours
     if (moment(order.date_order).isAfter(moment())) {
       return; // Ne rien faire si order.date_order est supérieur à moment()
     }
-    // Créer l'intervalle
+
+    // Calculer le temps restant en secondes jusqu'à ce que le compte à rebours atteigne 0
+    let diffInSeconds = moment(order.date_order)
+      .add(15, 'minutes')
+      .diff(moment(), 'seconds');
+
+    // Créer l'intervalle pour le compte à rebours
     intervalRef.current = setInterval(() => {
-      let time = moment().diff(moment(order.date_order));
-      // Conversion en minutes et secondes
-      var duration = moment.duration(time);
-      minutes = duration.minutes();
-      seconds = duration.seconds();
-
-      setElapsedTime(minutes + ':' + seconds);
-
-      // Arrêter l'intervalle si le temps de préparation atteint 15 minutes
-      if (minutes >= 15) {
+      if (diffInSeconds <= 0) {
         clearInterval(intervalRef.current);
+        setElapsedTime('00:00');
+        // Activez le clignotement en mettant à jour l'état local
+        setZeroBlink(true);
+      } else {
+        // Conversion en minutes et secondes
+        const minutes = Math.floor(diffInSeconds / 60);
+        const seconds = diffInSeconds % 60;
 
-        setElapsedTime('delai de preparation depassé');
+        setElapsedTime(minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
+
+        // Décrémenter le temps restant
+        diffInSeconds--;
       }
     }, 1000);
 
-    // Nettoyer l'intervalle lorsqu'un nouveau composant est monté ou démonté
+    // Créer l'intervalle pour le clignotement du zéro
+    const blinkInterval = setInterval(() => {
+      setZeroBlink((prevValue) => !prevValue);
+    }, 500);
+
+    // Nettoyer les intervalles lorsqu'un nouveau composant est monté ou démonté
     return () => {
       clearInterval(intervalRef.current);
+      clearInterval(blinkInterval);
     };
-  }, [order.date_order]);
+  }, [order]);
 
   // const iconElapsedColor = elapsedTime ? 'red' : 'black';
   let iconElapsedColor = 'black';
@@ -180,119 +206,266 @@ function OrderCard({ order, setOrdersData }) {
       iconElapsedColor = 'red';
     }
   }
-  if (elapsedTime === 'delai de preparation depassé') {
+  if (elapsedTime === "Magne ton cul t'es a la bourre") {
     iconElapsedColor = 'red';
   }
 
   const productInOrders = order.order_lines[0].products;
-  console.log('order.order_lines', order.order_lines[0].products);
+  // console.log('order.order_lines', order.order_lines);
+  let result = [];
+  let stopPlats = 0;
+  let stopEntrees = 0;
+  let stopDesserts = 0;
+  let stopBoissons = 0;
+
+  //trier le tableau en fonction de product categories
+  order.order_lines.sort(
+    (a, b) =>
+      a.products.id_product_categories - b.products.id_product_categories
+  ); // Tri par id_product_categories
+
+  //boucle pour afficher les plats de la commande
+  order.order_lines.map((value, index) => {
+    //"stop" pour afficher le titre "plats" par exemple et ne plus l'afficher si plusieurs plats
+    if (stopPlats === 0 && value.products.id_product_categories === 2) {
+      result.push(
+        <Typography
+          sx={{
+            marginTop: 3,
+            height: '3vh',
+            backgroundColor: 'rgba(160,160,160,0.4)',
+            alignItems: 'center',
+            display: 'flex',
+            fontWeight: 'bold',
+          }}
+        >
+          {' '}
+          <RamenDiningIcon sx={{ marginRight: '18px', color: 'black' }} />
+          Plats
+        </Typography>
+      );
+      stopPlats++;
+    }
+    if (stopEntrees === 0 && value.products.id_product_categories === 1) {
+      result.push(
+        <Typography
+          sx={{
+            marginTop: 3,
+            height: '3vh',
+            backgroundColor: 'rgba(160,160,160,0.4)',
+            alignItems: 'center',
+            display: 'flex',
+            fontWeight: 'bold',
+          }}
+        >
+          {' '}
+          <RoomServiceIcon sx={{ marginRight: '18px', color: 'black' }} />
+          Entrées
+        </Typography>
+      );
+      stopEntrees++;
+    }
+    if (stopDesserts === 0 && value.products.id_product_categories === 3) {
+      result.push(
+        <Typography
+          sx={{
+            marginTop: 3,
+            height: '3vh',
+            backgroundColor: 'rgba(160,160,160,0.4)',
+            alignItems: 'center',
+            display: 'flex',
+            fontWeight: 'bold',
+          }}
+        >
+          {' '}
+          <CookieIcon sx={{ marginRight: '18px', color: 'black' }} />
+          Desserts
+        </Typography>
+      );
+      stopDesserts++;
+    }
+    if (stopBoissons === 0 && value.products.id_product_categories === 4) {
+      result.push(
+        <>
+          <Typography
+            sx={{
+              marginTop: 3,
+              height: '3vh',
+              backgroundColor: 'rgba(160,160,160,0.4)',
+              alignItems: 'center',
+              display: 'flex',
+              fontWeight: 'bold',
+            }}
+          >
+            <LocalBarIcon sx={{ marginRight: '18px', color: 'black' }} />
+            Boissons
+          </Typography>
+        </>
+      );
+      stopBoissons++;
+    }
+
+    result.push(
+      <Box
+        sx={{
+          padding: 1,
+          display: 'flex',
+        }}
+      >
+        <Typography sx={{ fontWeight: 'bold', marginRight: 5 }}>
+          {value.quantity}{' '}
+        </Typography>
+        <Typography>{value.products.name}</Typography>
+      </Box>
+    );
+  });
 
   return (
-    <Card sx={{ margin: 2, padding: 0 }}>
-      <Toast ref={toast} />
-      <CardContent sx={{ padding: 0, paddingBottom: 0 }}>
-        <Box>
+    <>
+      <Card
+        sx={{
+          margin: 2,
+          padding: '0px',
+          minHeight: '400px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Toast ref={toast} />
+        <CardContent sx={{ padding: 0 }}>
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: '#f6a40055',
+              flexDirection: 'column',
+              height: '100%',
             }}
           >
-            <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
-            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-              {formattedHour}
-            </Typography>
-            <NotificationsActiveIcon
-              sx={{ marginLeft: '35px', color: iconElapsedColor }}
-            />
-            <Typography sx={{ marginLeft: '10px' }}>{elapsedTime}</Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              backgroundColor: '#f6a40055',
-              padding: 1,
-            }}
-          >
-            <Button
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: '#f6a40055',
+              }}
+            >
+              <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
+                {formattedHour}
+              </Typography>
+              <NotificationsActiveIcon
+                sx={{
+                  marginLeft: '35px',
+                  color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                  animation:
+                    elapsedTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
+                }}
+              />
+              {(order.id_status === 2 || order.id_status === 3) && (
+                <Typography
+                  sx={{
+                    marginLeft: '10px',
+                    fontSize: elapsedTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
+                    color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                  }}
+                >
+                  {elapsedTime}
+                </Typography>
+              )}
+            </Box>
+            <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
-                width: '40%',
-                fontSize: '0.7rem',
-                borderRadius: '50px',
-                textTransform: 'none',
-                pointerEvents: 'none',
-                backgroundColor: getOrderTypeColor(order.id_order_types),
-                color: 'black',
+                justifyContent: 'space-between',
+                backgroundColor: '#f6a40055',
+                padding: 1,
               }}
             >
-              {getOrderTypeIcon(order.id_order_types)}
-              {getOrderTypeLabel(order.id_order_types)}
+              <Button
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40%',
+                  fontSize: '0.7rem',
+                  borderRadius: '50px',
+                  textTransform: 'none',
+                  pointerEvents: 'none',
+                  backgroundColor: getOrderTypeColor(order.id_order_types),
+                  color: 'black',
+                }}
+              >
+                {getOrderTypeIcon(order.id_order_types)}
+                {getOrderTypeLabel(order.id_order_types)}
+              </Button>
+              <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
+
+              <Typography>
+                {!order.customers
+                  ? 'N/A'
+                  : order.customers.firstname +
+                    ' ' +
+                    order.customers.lastname.charAt(0) +
+                    '.'}
+              </Typography>
+            </Box>
+            {/* Affichage des plats, desserts,... */}
+            <Box sx={{}}>
+              <>
+                {result.map((value, index) => (
+                  <Box key={index}>{value}</Box>
+                ))}
+              </>
+              <Typography sx={{ padding: 1, fontWeight: 'bold' }}>
+                Prix : {order.total_price}€
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+        {/* BOX BUTTON */}
+        <Box
+          sx={{
+            justifyContent: 'flex-end',
+            alignSelf: 'center',
+            paddingBottom: 0,
+            margin: 2,
+          }}
+        >
+          {order.id_status === 2 ? (
+            <Button
+              sx={{ padding: '8px', fontSize: '0.7rem' }}
+              onClick={() => handleUpdateStatus(order.id)}
+            >
+              {' '}
+              <PlayArrowIcon sx={{ marginRight: '8px' }} />
+              Commencer la préparation
             </Button>
-            <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
-
-            <Typography>
-              {!order.customers
-                ? 'N/A'
-                : order.customers.firstname +
-                  ' ' +
-                  order.customers.lastname.charAt(0) +
-                  '.'}
-            </Typography>
-          </Box>
-
-          <Box sx={{ padding: 1 }}>
-            <Typography>{order.order_lines[0].products.name}</Typography>
-            <Typography></Typography>
-            <Typography></Typography>
-
-            <Typography>Prix : {order.total_price}€</Typography>
-          </Box>
-          <Box
-            sx={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              paddingBottom: 0,
-            }}
-          >
-            {order.id_status === 2 ? (
-              <Button
-                sx={{ padding: '8px', fontSize: '0.7rem' }}
-                onClick={() => handleUpdateStatus(order.id)}
-              >
-                {' '}
-                <PlayArrowIcon sx={{ marginRight: '8px' }} />
-                Commencer la préparation
-              </Button>
-            ) : (
-              <Button
-                sx={{ padding: '8px', fontSize: '0.7rem' }}
-                onClick={() => handleUpdateStatus(order.id)}
-              >
-                {' '}
-                <DoneIcon sx={{ marginRight: '8px' }} />
-                Marquer comme prête
-              </Button>
-            )}
-          </Box>
+          ) : order.id_status === 3 ? (
+            <Button
+              sx={{ padding: '8px', fontSize: '0.7rem' }}
+              onClick={() => handleUpdateStatus(order.id)}
+            >
+              {' '}
+              <DoneIcon sx={{ marginRight: '8px' }} />
+              Marquer comme prête
+            </Button>
+          ) : null}
         </Box>
-      </CardContent>
-    </Card>
+      </Card>
+    </>
   );
 }
 
 function OrdersPage() {
+  // États pour gérer les onglets et les commandes
+  const [selectedTab, setSelectedTab] = useState(0);
   // État pour stocker les données des orders
   const [ordersData, setOrdersData] = useState([]);
+  const toast = useRef(null);
 
   // Récupère les orders depuis la base de données
   useEffect(() => {
@@ -317,25 +490,81 @@ function OrdersPage() {
   const numberOfOrdersInProgress = ordersData.filter(
     (order) => order.id_status === 2
   ).length;
+  // Calcule le nombre de commandes en cours
+  const numberOfOrdersInPrepa = ordersData.filter(
+    (order) => order.id_status === 3
+  ).length;
+  // Calcule le nombre de commandes en cours
+  const numberOfOrdersPrepared = ordersData.filter(
+    (order) => order.id_status === 4
+  ).length;
 
   // Filtrer les commandes dont le statut est "payée"
-  const paidOrders = ordersData.filter(
-    (order) => order.id_status === 2 || order.id_status === 3
-  );
+  const paidOrders = ordersData.filter((order) => order.id_status === 2);
+  // Filtrer les commandes dont le statut est "en cours de prepa"
+  const prepaOrders = ordersData.filter((order) => order.id_status === 3);
+  // Filtrer les commandes dont le statut est "prête"
+  const preparedOrders = ordersData.filter((order) => order.id_status === 4);
+
+  // Filtrer et compter les commandes pour chaque statut
+  const ordersCounts = [
+    ordersData.filter((order) => order.id_status === 2).length,
+    ordersData.filter((order) => order.id_status === 3).length,
+    ordersData.filter((order) => order.id_status === 4).length,
+  ];
+
+  // Gérer le changement d'onglet
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
+  // Filtrer les commandes en fonction de l'onglet sélectionné
+  const filteredOrders = ordersData.filter((order) => {
+    switch (selectedTab) {
+      case 0:
+        return order.id_status === 2;
+      case 1:
+        return order.id_status === 3;
+      case 2:
+        return order.id_status === 4;
+      default:
+        return false;
+    }
+  });
 
   return (
-    <div>
-      <Typography variant="h4">
-        Récapitulatif des commandes en cours : {numberOfOrdersInProgress}
-      </Typography>
+    <Box
+      style={{
+        width: '80vw',
+        height: '100%',
+        margin: '-24px',
+      }}
+    >
+      <Toast ref={toast} />
+
+      {/* Utilisation du composant d'onglet d'icônes */}
+      <IconsTab
+        tabValue={selectedTab}
+        handleTabChange={handleTabChange}
+        ordersCounts={ordersCounts}
+      />
+
+      {/* Ajout d'un espace pour les onglets */}
+      <div style={{ height: '250px' }}></div>
+
+      {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
       <Grid container spacing={2}>
-        {paidOrders.map((order) => (
-          <Grid item xs={12} sm={6} md={4} key={order.id}>
-            <OrderCard order={order} setOrdersData={setOrdersData} />
+        {filteredOrders.map((order) => (
+          <Grid item xs={12} sm={6} md={3} key={order.id}>
+            <OrderCard
+              order={order}
+              setOrdersData={setOrdersData}
+              toast={toast}
+            />
           </Grid>
         ))}
       </Grid>
-    </div>
+    </Box>
   );
 }
 
