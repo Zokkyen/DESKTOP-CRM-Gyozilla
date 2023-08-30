@@ -66,6 +66,7 @@ const arrayNavigation = [
   {
     label: 'Commandes',
     icon: <ChecklistIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <OrdersPage onLinkClick={callback} />,
     },
