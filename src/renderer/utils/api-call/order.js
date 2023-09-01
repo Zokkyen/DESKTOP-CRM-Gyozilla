@@ -47,3 +47,12 @@ export const getCustomerFromOrder = async (id) => {
     return null; // En cas d'erreur, la fonction renvoie null ou une valeur par défaut appropriée
   }
 };
+export const editOrderLines = async (id, value) => {
+  try {
+    const response = await instance.patch(`order_lines/${id}`, value);
+    return response.data; // La fonction renvoie les données du client extraites de la réponse JSON
+  } catch (error) {
+    console.error('Erreur lors de la maj de orderlines:', error);
+    return null; // En cas d'erreur, la fonction renvoie null ou une valeur par défaut appropriée
+  }
+};

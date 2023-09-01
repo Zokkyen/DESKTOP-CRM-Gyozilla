@@ -1,3 +1,12 @@
+/* eslint-disable no-console */
+/* eslint-disable array-callback-return */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable radix */
+/* eslint-disable consistent-return */
+/* eslint-disable no-plusplus */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState, useRef } from 'react';
 import {
@@ -37,6 +46,7 @@ import CookieIcon from '@mui/icons-material/Cookie';
 import { io } from 'socket.io-client';
 import { Toast } from 'primereact/toast';
 import IconsTab from './IconsTab';
+import useCountdown from './useCountdown';
 
 import './Order.css';
 // Composant pour afficher une "card" d'order
@@ -108,7 +118,6 @@ function OrderCard({ order, setOrdersData, toast }) {
         return 'Status non renseigné';
     }
   };
-
   const handleUpdateStatus = async (id) => {
     try {
       let data;
@@ -142,92 +151,41 @@ function OrderCard({ order, setOrdersData, toast }) {
     }
   };
 
-  const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
-  const formattedHour = moment(order.date_order).format('HH:mm');
+  const formattedDate = moment(order.createdAt).format('DD-MM-YYYY');
+  const formattedHour = moment(order.createdAt).format('HH:mm');
   const currentHour = moment().format('HH:mm');
+  let minutes;
+  let seconds;
 
-  // Nouvel état local pour stocker l'heure de début de la commande
-  const [elapsedTime, setElapsedTime] = useState('');
-  var minutes;
-  var seconds;
+  //recuperation du hook personnalisé pour le compte a rebours
+  const remainingTime = useCountdown(order.createdAt);
 
-  const [zeroBlink, setZeroBlink] = useState(false);
-
-  // Utiliser une référence pour l'intervalle
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    // Vérifier si order.date_order est supérieur à moment() avant de démarrer le compte à rebours
-    if (moment(order.date_order).isAfter(moment())) {
-      return; // Ne rien faire si order.date_order est supérieur à moment()
-    }
-
-    // Calculer le temps restant en secondes jusqu'à ce que le compte à rebours atteigne 0
-    let diffInSeconds = moment(order.date_order)
-      .add(15, 'minutes')
-      .diff(moment(), 'seconds');
-
-    // Créer l'intervalle pour le compte à rebours
-    intervalRef.current = setInterval(() => {
-      if (diffInSeconds <= 0) {
-        clearInterval(intervalRef.current);
-        setElapsedTime('00:00');
-        // Activez le clignotement en mettant à jour l'état local
-        setZeroBlink(true);
-      } else {
-        // Conversion en minutes et secondes
-        const minutes = Math.floor(diffInSeconds / 60);
-        const seconds = diffInSeconds % 60;
-
-        setElapsedTime(minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
-
-        // Décrémenter le temps restant
-        diffInSeconds--;
-      }
-    }, 1000);
-
-    // Créer l'intervalle pour le clignotement du zéro
-    const blinkInterval = setInterval(() => {
-      setZeroBlink((prevValue) => !prevValue);
-    }, 500);
-
-    // Nettoyer les intervalles lorsqu'un nouveau composant est monté ou démonté
-    return () => {
-      clearInterval(intervalRef.current);
-      clearInterval(blinkInterval);
-    };
-  }, [order]);
-
-  // const iconElapsedColor = elapsedTime ? 'red' : 'black';
   let iconElapsedColor = 'black';
 
-  if (elapsedTime) {
-    const minutesValue = parseInt(elapsedTime.split(':')[0]);
+  if (remainingTime) {
+    const minutesValue = parseInt(remainingTime.split(':')[0]);
     if (minutesValue >= 10) {
       iconElapsedColor = 'red';
     }
   }
-  if (elapsedTime === "Magne ton cul t'es a la bourre") {
-    iconElapsedColor = 'red';
-  }
 
   const productInOrders = order.order_lines[0].products;
   // console.log('order.order_lines', order.order_lines);
-  let result = [];
+  const result = [];
   let stopPlats = 0;
   let stopEntrees = 0;
   let stopDesserts = 0;
   let stopBoissons = 0;
 
-  //trier le tableau en fonction de product categories
+  // trier le tableau en fonction de product categories
   order.order_lines.sort(
     (a, b) =>
       a.products.id_product_categories - b.products.id_product_categories
   ); // Tri par id_product_categories
 
-  //boucle pour afficher les plats de la commande
+  // boucle pour afficher les plats de la commande
   order.order_lines.map((value, index) => {
-    //"stop" pour afficher le titre "plats" par exemple et ne plus l'afficher si plusieurs plats
+    // "stop" pour afficher le titre "plats" par exemple et ne plus l'afficher si plusieurs plats
     if (stopPlats === 0 && value.products.id_product_categories === 2) {
       result.push(
         <Typography
@@ -287,21 +245,19 @@ function OrderCard({ order, setOrdersData, toast }) {
     }
     if (stopBoissons === 0 && value.products.id_product_categories === 4) {
       result.push(
-        <>
-          <Typography
-            sx={{
-              marginTop: 3,
-              height: '3vh',
-              backgroundColor: 'rgba(160,160,160,0.4)',
-              alignItems: 'center',
-              display: 'flex',
-              fontWeight: 'bold',
-            }}
-          >
-            <LocalBarIcon sx={{ marginRight: '18px', color: 'black' }} />
-            Boissons
-          </Typography>
-        </>
+        <Typography
+          sx={{
+            marginTop: 3,
+            height: '3vh',
+            backgroundColor: 'rgba(160,160,160,0.4)',
+            alignItems: 'center',
+            display: 'flex',
+            fontWeight: 'bold',
+          }}
+        >
+          <LocalBarIcon sx={{ marginRight: '18px', color: 'black' }} />
+          Boissons
+        </Typography>
       );
       stopBoissons++;
     }
@@ -320,144 +276,144 @@ function OrderCard({ order, setOrdersData, toast }) {
       </Box>
     );
   });
+  console.log('remainingTime', remainingTime);
 
   return (
-    <>
-      <Card
-        sx={{
-          margin: 2,
-          padding: '0px',
-          minHeight: '600px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Toast ref={toast} />
-        <CardContent sx={{ padding: 0 }}>
+    <Card
+      sx={{
+        margin: 2,
+        padding: 0,
+        minHeight: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Toast ref={toast} />
+      <CardContent sx={{ padding: 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            padding: 0,
+          }}
+        >
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#f6a40055',
+              padding: 0,
+            }}
+          >
+            <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
+            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
+              {formattedHour}
+            </Typography>
+            <NotificationsActiveIcon
+              sx={{
+                marginLeft: '35px',
+                color: remainingTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                animation:
+                  remainingTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
+              }}
+            />
+            {(order.id_status === 2 || order.id_status === 3) && (
+              <Typography
+                sx={{
+                  marginLeft: '10px',
+                  fontSize: remainingTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
+                  color: remainingTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                }}
+              >
+                {remainingTime}
+              </Typography>
+            )}
+          </Box>
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#f6a40055',
+              padding: 1,
             }}
           >
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#f6a40055',
-              }}
-            >
-              <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
-              <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-                {formattedHour}
-              </Typography>
-              <NotificationsActiveIcon
-                sx={{
-                  marginLeft: '35px',
-                  color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
-                  animation:
-                    elapsedTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
-                }}
-              />
-              {(order.id_status === 2 || order.id_status === 3) && (
-                <Typography
-                  sx={{
-                    marginLeft: '10px',
-                    fontSize: elapsedTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
-                    color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
-                  }}
-                >
-                  {elapsedTime}
-                </Typography>
-              )}
-            </Box>
-            <Box
+            <Button
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: '#f6a40055',
-                padding: 1,
+                justifyContent: 'center',
+                width: '40%',
+                fontSize: '0.7rem',
+                borderRadius: '50px',
+                textTransform: 'none',
+                pointerEvents: 'none',
+                backgroundColor: getOrderTypeColor(order.id_order_types),
+                color: 'black',
               }}
             >
-              <Button
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40%',
-                  fontSize: '0.7rem',
-                  borderRadius: '50px',
-                  textTransform: 'none',
-                  pointerEvents: 'none',
-                  backgroundColor: getOrderTypeColor(order.id_order_types),
-                  color: 'black',
-                }}
-              >
-                {getOrderTypeIcon(order.id_order_types)}
-                {getOrderTypeLabel(order.id_order_types)}
-              </Button>
-              <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
+              {getOrderTypeIcon(order.id_order_types)}
+              {getOrderTypeLabel(order.id_order_types)}
+            </Button>
+            <Typography sx={{ fontWeight: 'bold' }}>#{order.id}</Typography>
 
-              <Typography>
-                {!order.customers
-                  ? 'N/A'
-                  : order.customers.firstname +
-                    ' ' +
-                    order.customers.lastname.charAt(0) +
-                    '.'}
-              </Typography>
-            </Box>
-            {/* Affichage des plats, desserts,... */}
-            <Box sx={{}}>
-              <>
-                {result.map((value, index) => (
-                  <Box key={index}>{value}</Box>
-                ))}
-              </>
-              <Typography sx={{ padding: 1, fontWeight: 'bold' }}>
-                Prix : {order.total_price}€
-              </Typography>
-            </Box>
+            <Typography>
+              {!order.customers
+                ? 'N/A'
+                : `${
+                    order.customers.firstname
+                  } ${order.customers.lastname.charAt(0)}.`}
+            </Typography>
           </Box>
-        </CardContent>
-        {/* BOX BUTTON */}
-        <Box
-          sx={{
-            justifyContent: 'flex-end',
-            alignSelf: 'center',
-            paddingBottom: 0,
-            margin: 2,
-          }}
-        >
-          {order.id_status === 2 ? (
-            <Button
-              sx={{ padding: '8px', fontSize: '0.7rem' }}
-              onClick={() => handleUpdateStatus(order.id)}
-            >
-              {' '}
-              <PlayArrowIcon sx={{ marginRight: '8px' }} />
-              Commencer la préparation
-            </Button>
-          ) : order.id_status === 3 ? (
-            <Button
-              sx={{ padding: '8px', fontSize: '0.7rem' }}
-              onClick={() => handleUpdateStatus(order.id)}
-            >
-              {' '}
-              <DoneIcon sx={{ marginRight: '8px' }} />
-              Marquer comme prête
-            </Button>
-          ) : null}
+          {/* Affichage des plats, desserts,... */}
+          <Box sx={{}}>
+            <>
+              {result.map((value, index) => (
+                <Box key={index}>{value}</Box>
+              ))}
+            </>
+            <Typography sx={{ padding: 1, fontWeight: 'bold' }}>
+              Prix : {order.total_price}€
+            </Typography>
+          </Box>
         </Box>
-      </Card>
-    </>
+      </CardContent>
+      {/* BOX BUTTON */}
+      <Box
+        sx={{
+          justifyContent: 'flex-end',
+          alignSelf: 'center',
+          paddingBottom: 0,
+          margin: 2,
+        }}
+      >
+        {order.id_status === 2 ? (
+          <Button
+            sx={{ padding: '8px', fontSize: '0.7rem' }}
+            onClick={() => handleUpdateStatus(order.id)}
+          >
+            {' '}
+            <PlayArrowIcon sx={{ marginRight: '8px' }} />
+            Commencer la préparation
+          </Button>
+        ) : order.id_status === 3 ? (
+          <Button
+            sx={{ padding: '8px', fontSize: '0.7rem' }}
+            onClick={() => handleUpdateStatus(order.id)}
+          >
+            {' '}
+            <DoneIcon sx={{ marginRight: '8px' }} />
+            Marquer comme prête
+          </Button>
+        ) : null}
+      </Box>
+    </Card>
   );
 }
 
@@ -487,7 +443,7 @@ function OrdersPage() {
     //   console.log('nouvelleDonnées');
     // });
   }, []);
-  console.log('ordersData', ordersData);
+  // console.log('ordersData', ordersData);
 
   // Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(
@@ -537,12 +493,10 @@ function OrdersPage() {
 
   return (
     <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+      style={{
+        width: '80vw',
         height: '100%',
-        position: 'relative',
+        margin: '-24px',
       }}
     >
       <Toast ref={toast} />
@@ -554,44 +508,37 @@ function OrdersPage() {
         ordersCounts={ordersCounts}
       />
 
-      <Box
+      {/* Ajout d'un espace pour les onglets */}
+      <Box style={{ height: '250px' }} />
+
+      {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
+      <Grid
+        container
+        spacing={1}
         sx={{
+          width: '100vw',
           display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1, // Ajuster la hauteur du contenu pour remplir l'espace disponible
-          paddingTop: '20px', // Ajouter de la marge en haut
+          justifyContent: 'center',
+          padding: 0,
         }}
       >
-        {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
-        <Grid
-          container
-          centered
-          spacing={1}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '200px',
-          }}
-        >
-          {filteredOrders.map((order) => (
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              md={3}
-              key={order.id}
-              sx={{ marginTop: '20px' }} // Ajouter de la marge en haut de chaque carte
-            >
-              <OrderCard
-                order={order}
-                setOrdersData={setOrdersData}
-                toast={toast}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+        {filteredOrders.map((order) => (
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={3}
+            key={order.id}
+            sx={{ paddingLeft: 0 }}
+          >
+            <OrderCard
+              order={order}
+              setOrdersData={setOrdersData}
+              toast={toast}
+            />
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }

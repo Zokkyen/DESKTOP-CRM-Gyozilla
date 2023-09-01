@@ -7,3 +7,6 @@
     transform: rotate(35deg); /* ou toute autre valeur pour l'effet désiré */
   }
 }
+.css-1vg40jy-MuiGrid-root > .MuiGrid-item {
+  padding-left: 0px !important;
+}
