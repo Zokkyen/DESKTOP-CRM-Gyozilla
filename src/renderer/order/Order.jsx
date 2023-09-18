@@ -46,6 +46,7 @@ import CookieIcon from '@mui/icons-material/Cookie';
 import { io } from 'socket.io-client';
 import { Toast } from 'primereact/toast';
 import IconsTab from './IconsTab';
+import useCountdown from './useCountdown';
 
 import './Order.css';
 // Composant pour afficher une "card" d'order
@@ -117,7 +118,6 @@ function OrderCard({ order, setOrdersData, toast }) {
         return 'Status non renseigné';
     }
   };
-
   const handleUpdateStatus = async (id) => {
     try {
       let data;
@@ -151,9 +151,11 @@ function OrderCard({ order, setOrdersData, toast }) {
     }
   };
 
-  const formattedDate = moment(order.date_order).format('DD-MM-YYYY');
-  const formattedHour = moment(order.date_order).format('HH:mm');
+  const formattedDate = moment(order.createdAt).format('DD-MM-YYYY');
+  const formattedHour = moment(order.createdAt).format('HH:mm');
   const currentHour = moment().format('HH:mm');
+  let minutes;
+  let seconds;
 
   // Nouvel état local pour stocker l'heure de début de la commande
   const [elapsedTime, setElapsedTime] = useState('');
@@ -208,16 +210,16 @@ function OrderCard({ order, setOrdersData, toast }) {
   }, [order]);
 
   // const iconElapsedColor = elapsedTime ? 'red' : 'black';
+  //recuperation du hook personnalisé pour le compte a rebours
+  const remainingTime = useCountdown(order.createdAt);
+
   let iconElapsedColor = 'black';
 
-  if (elapsedTime) {
-    const minutesValue = parseInt(elapsedTime.split(':')[0]);
+  if (remainingTime) {
+    const minutesValue = parseInt(remainingTime.split(':')[0]);
     if (minutesValue >= 10) {
       iconElapsedColor = 'red';
     }
-  }
-  if (elapsedTime === "Magne ton cul t'es a la bourre") {
-    iconElapsedColor = 'red';
   }
 
   const productInOrders = order.order_lines[0].products;
@@ -327,12 +329,13 @@ function OrderCard({ order, setOrdersData, toast }) {
       </Box>
     );
   });
+  console.log('remainingTime', remainingTime);
 
   return (
     <Card
       sx={{
         margin: 2,
-        padding: '0px',
+        padding: 0,
         minHeight: '400px',
         display: 'flex',
         flexDirection: 'column',
@@ -346,6 +349,7 @@ function OrderCard({ order, setOrdersData, toast }) {
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
+            padding: 0,
           }}
         >
           <Box
@@ -355,6 +359,7 @@ function OrderCard({ order, setOrdersData, toast }) {
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: '#f6a40055',
+              padding: 0,
             }}
           >
             <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
@@ -364,20 +369,20 @@ function OrderCard({ order, setOrdersData, toast }) {
             <NotificationsActiveIcon
               sx={{
                 marginLeft: '35px',
-                color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                color: remainingTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
                 animation:
-                  elapsedTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
+                  remainingTime === '00:00' ? 'alarm 0.8s infinite' : 'none', // Animation d'alarme
               }}
             />
             {(order.id_status === 2 || order.id_status === 3) && (
               <Typography
                 sx={{
                   marginLeft: '10px',
-                  fontSize: elapsedTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
-                  color: elapsedTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
+                  fontSize: remainingTime === '00:00' ? '1.2rem' : '1rem', // Agrandir le chrono
+                  color: remainingTime === '00:00' ? 'red' : 'inherit', // Appliquer la couleur rouge
                 }}
               >
-                {elapsedTime}
+                {remainingTime}
               </Typography>
             )}
           </Box>
@@ -491,7 +496,7 @@ function OrdersPage() {
     //   console.log('nouvelleDonnées');
     // });
   }, []);
-  console.log('ordersData', ordersData);
+  // console.log('ordersData', ordersData);
 
   // Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(
@@ -560,9 +565,25 @@ function OrdersPage() {
       <Box style={{ height: '250px' }} />
 
       {/* Utilisation de filteredOrders au lieu de paidOrders, prepaOrders, preparedOrders */}
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          width: '100vw',
+          display: 'flex',
+          justifyContent: 'center',
+          padding: 0,
+        }}
+      >
         {filteredOrders.map((order) => (
-          <Grid item xs={12} sm={6} md={3} key={order.id}>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={3}
+            key={order.id}
+            sx={{ paddingLeft: 0 }}
+          >
             <OrderCard
               order={order}
               setOrdersData={setOrdersData}

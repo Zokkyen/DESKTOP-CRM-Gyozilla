@@ -1,7 +1,6 @@
 /* eslint-disable import/no-named-as-default */
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable import/no-cycle */
-import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -12,10 +11,20 @@ import Profile from './profile/Profile';
 import Home from './home/Home';
 import Ca from './ca/Ca';
 import CrudIngredient from './crudIngredient/CrudIngredient';
+import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import CrudStock from './crudStock/CrudStock';
 import OrdersPage from './order/Order';
+import Cooking from './order/Cooking';
 
 const arrayNavigation = [
+  {
+    label: 'Cuisine',
+    icon: <RamenDiningIcon />,
+    roles: [3, 4],
+    component: {
+      callback: ({ callback }) => <Cooking onLinkClick={callback} />,
+    },
+  },
   {
     label: 'Accueil',
     icon: <HomeIcon />,
