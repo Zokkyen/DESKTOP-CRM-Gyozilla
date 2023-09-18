@@ -89,6 +89,14 @@ const arrayNavigation = [
       callback: ({ callback }) => <OrdersPage onLinkClick={callback} />,
     },
   },
+  {
+    label: 'Cuisine',
+    icon: <RamenDiningIcon />,
+    roles: [3, 4],
+    component: {
+      callback: ({ callback }) => <Cooking onLinkClick={callback} />,
+    },
+  },
 ];
 
 export const getNavigationItemsForRole = (role) => {

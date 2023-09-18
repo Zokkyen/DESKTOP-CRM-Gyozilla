@@ -31,9 +31,8 @@ function OrderTable({ order }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [cookCounts, setCookCounts] = useState(true);
-  const remainingTime = order ? useCountdown(order) : null;
-  // const remainingTime = useCountdown(order);
-
+  //recuperation du hook personnalisé pour le compte a rebours
+  const remainingTime = order && order.createdAt ? useCountdown(order) : null;
   useEffect(() => {
     // Récupération des données des commandes au chargement initial
     const fetchOrdersData = async () => {
