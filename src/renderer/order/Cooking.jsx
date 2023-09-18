@@ -1,14 +1,25 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/button-has-type */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable promise/always-return */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/prop-types */
+/* eslint-disable no-plusplus */
 import React, { useEffect, useRef, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import moment from 'moment';
-import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByFranchise';
 import './Cooking.css'; // Assurez-vous de créer ce fichier CSS pour personnaliser le style du tableau
-import IconsTabCooking from './IconsTabsCooking';
 import { Box, padding } from '@mui/system';
 import { Typography } from '@mui/material';
-import { editOrderLines } from 'renderer/utils/api-call/order';
 import { Toast } from 'primereact/toast';
+import { editOrderLines } from 'renderer/utils/api-call/order';
+import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByFranchise';
+import IconsTabCooking from './IconsTabsCooking';
 import useCountdown from './useCountdown';
 
 function OrderTable({ order }) {
@@ -18,7 +29,7 @@ function OrderTable({ order }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [cookCounts, setCookCounts] = useState(true);
-  //recuperation du hook personnalisé pour le compte a rebours
+  // recuperation du hook personnalisé pour le compte a rebours
   const remainingTime = useCountdown(order);
 
   useEffect(() => {
@@ -71,8 +82,8 @@ function OrderTable({ order }) {
       let nonReadyCount = 0;
       let readyCount = 0;
 
-      let updatedPreparingOrders = [];
-      let preparingRows = [];
+      const updatedPreparingOrders = [];
+      const preparingRows = [];
 
       ordersData.forEach((order) => {
         order.order_lines.forEach((ol) => {
@@ -90,14 +101,13 @@ function OrderTable({ order }) {
       });
 
       updatedPreparingOrders.forEach((order) => {
-        console.log('order', order);
         preparingRows.push({
           id: order.id,
           productName: order.products.name,
           category: categoryMap[order.products.id_product_categories],
           date: moment(order.createdAt).format('DD-MM-YYYY'),
           time: moment(order.createdAt).format('HH:mm'),
-          //timer: remainingTime,
+          // timer: remainingTime,
           quantity: order.quantity,
         });
       });
@@ -110,8 +120,8 @@ function OrderTable({ order }) {
   useEffect(() => {
     // Mise à jour des commandes préparées
     if (ordersData.length !== 0) {
-      let updatedPreparedOrders = [];
-      let preparedRows = [];
+      const updatedPreparedOrders = [];
+      const preparedRows = [];
       ordersData.forEach((o) => {
         o.order_lines.forEach((ol) => {
           if (
@@ -143,11 +153,11 @@ function OrderTable({ order }) {
   const getCategoryClassName = (category) => {
     if (category === 'Entrées') {
       return 'category-1';
-    } else if (category === 'Plats') {
-      return 'category-2';
-    } else {
-      return 'category-unknown';
     }
+    if (category === 'Plats') {
+      return 'category-2';
+    }
+    return 'category-unknown';
   };
   const toastRef = useRef(null);
 
@@ -159,7 +169,7 @@ function OrderTable({ order }) {
         handleTabChange={handleTabChange}
         cookCounts={cookCounts}
       />
-      <Box sx={{ height: '300px' }}></Box>
+      <Box sx={{ height: '300px' }} />
       {selectedTab === 0 ? (
         preparingOrders.length > 0 ? (
           <DataTable
@@ -221,7 +231,7 @@ function OrderTable({ order }) {
             <Column field="quantity" header="Quantité" />
           </DataTable>
         ) : (
-          <Typography></Typography>
+          <Typography />
         )
       ) : null}
       <Toast ref={toastRef} />{' '}

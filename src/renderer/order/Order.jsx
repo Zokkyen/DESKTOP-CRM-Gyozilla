@@ -17,15 +17,8 @@ import {
   Button,
   Badge,
 } from '@mui/material';
-import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByFranchise';
 import moment from 'moment';
 import { Box, padding } from '@mui/system';
-import {
-  getCustomerFromOrder,
-  getOrderLinesByOrderId,
-  patchOrder,
-  getProductsById,
-} from 'renderer/utils/api-call/order';
 
 // Import des icônes
 import LocalMallIcon from '@mui/icons-material/LocalMall';
@@ -45,6 +38,13 @@ import RoomServiceIcon from '@mui/icons-material/RoomService';
 import CookieIcon from '@mui/icons-material/Cookie';
 import { io } from 'socket.io-client';
 import { Toast } from 'primereact/toast';
+import {
+  getCustomerFromOrder,
+  getOrderLinesByOrderId,
+  patchOrder,
+  getProductsById,
+} from 'renderer/utils/api-call/order';
+import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByFranchise';
 import IconsTab from './IconsTab';
 import useCountdown from './useCountdown';
 
@@ -159,9 +159,6 @@ function OrderCard({ order, setOrdersData, toast }) {
 
   // Nouvel état local pour stocker l'heure de début de la commande
   const [elapsedTime, setElapsedTime] = useState('');
-  let minutes;
-  let seconds;
-
   const [zeroBlink, setZeroBlink] = useState(false);
 
   // Utiliser une référence pour l'intervalle
@@ -210,7 +207,7 @@ function OrderCard({ order, setOrdersData, toast }) {
   }, [order]);
 
   // const iconElapsedColor = elapsedTime ? 'red' : 'black';
-  //recuperation du hook personnalisé pour le compte a rebours
+  // recuperation du hook personnalisé pour le compte a rebours
   const remainingTime = useCountdown(order.createdAt);
 
   let iconElapsedColor = 'black';

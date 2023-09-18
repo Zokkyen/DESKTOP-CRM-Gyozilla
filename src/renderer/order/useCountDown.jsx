@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable consistent-return */
+/* eslint-disable no-plusplus */
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 
