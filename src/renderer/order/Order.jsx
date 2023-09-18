@@ -51,7 +51,7 @@ import IconsTab from './IconsTab';
 import useCountdown from './useCountdown';
 
 import './Order.css';
-import { UserContext } from 'renderer/utils/context/UserContext';
+
 // Composant pour afficher une "card" d'order
 function OrderCard({ order, setOrdersData, toast }) {
   const getOrderTypeLabel = (orderTypeId) => {
