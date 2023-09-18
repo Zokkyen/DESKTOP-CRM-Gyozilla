@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable array-callback-return */
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -8,7 +9,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import {
   Card,
   CardContent,
@@ -45,6 +46,7 @@ import {
   getProductsById,
 } from 'renderer/utils/api-call/order';
 import { getAllOrdersByFranchise } from 'renderer/utils/api-call/getAllOrdersByFranchise';
+import { UserContext } from 'renderer/utils/context/UserContext';
 import IconsTab from './IconsTab';
 import useCountdown from './useCountdown';
 
@@ -157,58 +159,9 @@ function OrderCard({ order, setOrdersData, toast }) {
   let minutes;
   let seconds;
 
-  // Nouvel état local pour stocker l'heure de début de la commande
-  const [elapsedTime, setElapsedTime] = useState('');
-  const [zeroBlink, setZeroBlink] = useState(false);
-
-  // Utiliser une référence pour l'intervalle
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    // Vérifier si order.date_order est supérieur à moment() avant de démarrer le compte à rebours
-    if (moment(order.date_order).isAfter(moment())) {
-      return; // Ne rien faire si order.date_order est supérieur à moment()
-    }
-
-    // Calculer le temps restant en secondes jusqu'à ce que le compte à rebours atteigne 0
-    let diffInSeconds = moment(order.date_order)
-      .add(15, 'minutes')
-      .diff(moment(), 'seconds');
-
-    // Créer l'intervalle pour le compte à rebours
-    intervalRef.current = setInterval(() => {
-      if (diffInSeconds <= 0) {
-        clearInterval(intervalRef.current);
-        setElapsedTime('00:00');
-        // Activez le clignotement en mettant à jour l'état local
-        setZeroBlink(true);
-      } else {
-        // Conversion en minutes et secondes
-        const minutes = Math.floor(diffInSeconds / 60);
-        const seconds = diffInSeconds % 60;
-
-        setElapsedTime(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
-
-        // Décrémenter le temps restant
-        diffInSeconds--;
-      }
-    }, 1000);
-
-    // Créer l'intervalle pour le clignotement du zéro
-    const blinkInterval = setInterval(() => {
-      setZeroBlink((prevValue) => !prevValue);
-    }, 500);
-
-    // Nettoyer les intervalles lorsqu'un nouveau composant est monté ou démonté
-    return () => {
-      clearInterval(intervalRef.current);
-      clearInterval(blinkInterval);
-    };
-  }, [order]);
-
-  // const iconElapsedColor = elapsedTime ? 'red' : 'black';
   // recuperation du hook personnalisé pour le compte a rebours
   const remainingTime = useCountdown(order.createdAt);
+  // const remainingTime = '15:00';
 
   let iconElapsedColor = 'black';
 
@@ -327,7 +280,7 @@ function OrderCard({ order, setOrdersData, toast }) {
     );
   });
   console.log('remainingTime', remainingTime);
-
+  console.log('orderinorder', order);
   return (
     <Card
       sx={{
@@ -475,12 +428,13 @@ function OrdersPage() {
   const [orderLines, setOrderLines] = useState([]);
   const [customerData, setCustomerData] = useState(null);
   const toast = useRef(null);
+  const { user } = useContext(UserContext);
 
   // Récupère les orders depuis la base de données
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
-        const response = await getAllOrdersByFranchise(1);
+        const response = await getAllOrdersByFranchise(user.franchise);
         setOrdersData(response.data.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des orders :', error);
@@ -493,7 +447,6 @@ function OrdersPage() {
     //   console.log('nouvelleDonnées');
     // });
   }, []);
-  // console.log('ordersData', ordersData);
 
   // Calcule le nombre de commandes en cours
   const numberOfOrdersInProgress = ordersData.filter(

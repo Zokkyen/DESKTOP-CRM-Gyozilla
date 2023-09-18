@@ -1,3 +1,7 @@
+/* eslint-disable react/style-prop-object */
+/* eslint-disable array-callback-return */
+/* eslint-disable no-sequences */
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/no-unescaped-entities */
@@ -13,7 +17,17 @@
 /* eslint-disable import/no-cycle */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
-import { Box, Button, MenuItem, Select, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
 
 import {
   startOfMonth,
@@ -39,6 +53,7 @@ import {
   Legend,
   Filler,
   BarElement,
+  Tooltip,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { UserContext } from '../utils/context/UserContext';
@@ -54,7 +69,8 @@ ChartJS.register(
   Title,
   Legend,
   Filler,
-  BarElement
+  BarElement,
+  Tooltip
 );
 
 // Code pour le graphique total des ventes et nombre de commandes par mois ou année
@@ -75,21 +91,17 @@ const getOptions = (period, selectedDate) => ({
     tooltip: {
       callbacks: {
         label: (context) => {
-          const { label } = context;
+          const { label, datasetIndex } = context;
           const value = context.parsed.y;
+
+          if (datasetIndex === 0) {
+            return `Chiffre d'affaires: ${value}€`;
+          }
+          if (datasetIndex === 1) {
+            return `Nombre de commandes: ${value}`;
+          }
+
           return `${label}: ${value}€`;
-        },
-        afterLabel: (context) => {
-          const index = context.dataIndex;
-          const { datasets } = context.chart.data;
-
-          const revenue = datasets[0]?.data[index];
-          const count = datasets[1]?.data[index];
-
-          return [
-            `Nombre de commandes: ${count}`,
-            `Chiffre d'affaires: ${revenue}€`,
-          ];
         },
       },
     },
@@ -157,8 +169,6 @@ function groupByPeriod(period, data, selectedDate) {
   }
 
   const labels = Object.keys(groupedData).sort();
-  console.log(labels);
-
   const datasetRevenue = {
     yAxisID: 'yRevenues',
     fill: true,
@@ -184,19 +194,26 @@ function groupByPeriod(period, data, selectedDate) {
 
 function groupExpensesByType(expenses) {
   const groupedExpenses = {};
+  const groupedDetailExpenses = {};
 
   for (const expense of expenses) {
     const type = expense.expense_types.name;
     if (!groupedExpenses[type]) {
       groupedExpenses[type] = 0;
     }
+    if (!groupedDetailExpenses[type]) {
+      groupedDetailExpenses[type] = [];
+    }
     groupedExpenses[type] += expense.amount;
+    groupedDetailExpenses[type].push({
+      name: expense.name,
+      amount: expense.amount,
+    });
   }
-
-  return groupedExpenses;
+  return { groupedExpenses, groupedDetailExpenses };
 }
 
-export const optionsBar = {
+export const optionsBar = (expenses) => ({
   responsive: true,
   plugins: {
     tooltip: {
@@ -207,32 +224,30 @@ export const optionsBar = {
           return `${label}: ${value}€`;
         },
         afterLabel: (context) => {
-          const index = context.dataIndex;
-          const expenseInfo = 'Liste des noms et leurs montants...';
-          return expenseInfo;
+          const expenseDetails = expenses[context.label];
+          if (!expenseDetails) {
+            return 'Pas de détails disponibles';
+          }
+          const detailsList = expenseDetails.map((detailExpense) => {
+            return `${detailExpense.name}: ${detailExpense.amount}€`;
+          });
+
+          return detailsList.join('\n');
         },
       },
     },
   },
-};
-
-const labelsBar = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-];
+});
 
 export default function Ca() {
   const [period, setPeriod] = useState('mois');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [allOrders, setAllOrders] = useState(null);
   const [allExpenses, setAllExpenses] = useState(null);
+  const [expenseDetails, setExpenseDetails] = useState([]);
   const { user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handlePrevClick = () => {
     switch (period) {
@@ -277,8 +292,13 @@ export default function Ca() {
           selectedDate
         );
         setAllOrders({ labels, datasets });
-        const groupedExpenses = groupExpensesByType(expensesResponse.data);
+
+        const { groupedExpenses, groupedDetailExpenses } = groupExpensesByType(
+          expensesResponse.data
+        );
         setAllExpenses(groupedExpenses);
+        setExpenseDetails(groupedDetailExpenses);
+
         setIsLoading(false);
       })
       .catch((error) => {
@@ -310,7 +330,9 @@ export default function Ca() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: '80vw',
+        width: '70vw',
+        margin: '0 auto 0 auto',
+        paddingBottom: '50px',
       }}
     >
       <Typography
@@ -353,7 +375,11 @@ export default function Ca() {
           <Line options={getOptions(period, selectedDate)} data={allOrders} />
         </Box>
       </Box>
-      {allExpenses && <Bar options={optionsBar} data={dataBar} />}
+      {allExpenses && (
+        <Box>
+          <Bar options={optionsBar(expenseDetails)} data={dataBar} />
+        </Box>
+      )}
     </Box>
   );
 }

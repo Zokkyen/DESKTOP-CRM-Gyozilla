@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable no-console */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable no-nested-ternary */
@@ -13,7 +15,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import moment from 'moment';
-import './Cooking.css'; // Assurez-vous de créer ce fichier CSS pour personnaliser le style du tableau
+import './Cooking.css';
 import { Box, padding } from '@mui/system';
 import { Typography } from '@mui/material';
 import { Toast } from 'primereact/toast';
@@ -29,8 +31,8 @@ function OrderTable({ order }) {
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [cookCounts, setCookCounts] = useState(true);
-  // recuperation du hook personnalisé pour le compte a rebours
-  const remainingTime = useCountdown(order);
+  const remainingTime = order ? useCountdown(order) : null;
+  // const remainingTime = useCountdown(order);
 
   useEffect(() => {
     // Récupération des données des commandes au chargement initial
@@ -107,7 +109,6 @@ function OrderTable({ order }) {
           category: categoryMap[order.products.id_product_categories],
           date: moment(order.createdAt).format('DD-MM-YYYY'),
           time: moment(order.createdAt).format('HH:mm'),
-          // timer: remainingTime,
           quantity: order.quantity,
         });
       });
