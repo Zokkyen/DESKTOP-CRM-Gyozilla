@@ -3,6 +3,7 @@ import moment from 'moment';
 
 function useCountdown(order) {
   const [remainingTime, setRemainingTime] = useState('');
+  console.log('order', order);
   const orderDate = moment(order.createdAt);
   useEffect(() => {
     if (orderDate.isAfter(moment())) {

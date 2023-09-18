@@ -18,14 +18,6 @@ import Cooking from './order/Cooking';
 
 const arrayNavigation = [
   {
-    label: 'Cuisine',
-    icon: <RamenDiningIcon />,
-    roles: [3, 4],
-    component: {
-      callback: ({ callback }) => <Cooking onLinkClick={callback} />,
-    },
-  },
-  {
     label: 'Accueil',
     icon: <HomeIcon />,
     roles: [1, 2, 3, 4],
@@ -78,6 +70,14 @@ const arrayNavigation = [
     roles: [3, 4],
     component: {
       callback: ({ callback }) => <OrdersPage onLinkClick={callback} />,
+    },
+  },
+  {
+    label: 'Cuisine',
+    icon: <RamenDiningIcon />,
+    roles: [3, 4],
+    component: {
+      callback: ({ callback }) => <Cooking onLinkClick={callback} />,
     },
   },
 ];

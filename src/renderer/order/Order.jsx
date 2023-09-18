@@ -8,7 +8,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import {
   Card,
   CardContent,
@@ -49,6 +49,7 @@ import IconsTab from './IconsTab';
 import useCountdown from './useCountdown';
 
 import './Order.css';
+import { UserContext } from 'renderer/utils/context/UserContext';
 // Composant pour afficher une "card" d'order
 function OrderCard({ order, setOrdersData, toast }) {
   const getOrderTypeLabel = (orderTypeId) => {
@@ -277,7 +278,7 @@ function OrderCard({ order, setOrdersData, toast }) {
     );
   });
   console.log('remainingTime', remainingTime);
-
+  console.log('orderinorder', order);
   return (
     <Card
       sx={{
@@ -425,12 +426,13 @@ function OrdersPage() {
   const [orderLines, setOrderLines] = useState([]);
   const [customerData, setCustomerData] = useState(null);
   const toast = useRef(null);
+  const { user } = useContext(UserContext);
 
   // Récupère les orders depuis la base de données
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
-        const response = await getAllOrdersByFranchise(1);
+        const response = await getAllOrdersByFranchise(user.franchise);
         setOrdersData(response.data.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des orders :', error);
