@@ -1,3 +1,5 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-return-await */
 import instance from '../interceptor';
 
 export const getAllOrdersByFranchise = async (id) => {

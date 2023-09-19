@@ -10,7 +10,7 @@ import {
 import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import React from 'react';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
-import CrudStock from 'renderer/crudStock/CrudStock';
+import CrudStock from 'renderer/crudIngredient/CrudIngredient';
 import OrdersPage from 'renderer/order/Order';
 import './Home.css';
 

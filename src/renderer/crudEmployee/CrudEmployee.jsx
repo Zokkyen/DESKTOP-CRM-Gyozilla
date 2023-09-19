@@ -1,479 +1,1187 @@
-import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { SelectButton } from 'primereact/selectbutton';
-import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
-import { addEmployee } from 'renderer/utils/api-call/addEmployee';
-import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
-import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
-import { Button } from '@mui/material';
-import { TextField, Grid } from '@mui/material';
-import { Dialog } from 'primereact/dialog';
-import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import React, { useState, useEffect, useRef } from 'react';
+// import './CrudEmployee.css';
+// import { DataTable } from 'primereact/datatable';
+// import { classNames } from 'primereact/utils';
+// import { Column } from 'primereact/column';
+// import { Toast } from 'primereact/toast';
+// import { Button } from 'primereact/button';
+// import { FileUpload } from 'primereact/fileupload';
+// import { Rating } from 'primereact/rating';
+// import { Toolbar } from 'primereact/toolbar';
+// import { InputTextarea } from 'primereact/inputtextarea';
+// import { RadioButton } from 'primereact/radiobutton';
+// import { InputNumber } from 'primereact/inputnumber';
+// import { Dialog } from 'primereact/dialog';
+// import { InputText } from 'primereact/inputtext';
+// import { Tag } from 'primereact/tag';
+// import { Badge } from 'primereact/badge';
+// import { Formik, Form, Field, ErrorMessage } from 'formik';
+// import * as Yup from 'yup';
+// import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
+// import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
+// import { createEmployee } from 'renderer/utils/api-call/createEmployee';
+// import { Box, InputAdornment, TextField, Typography } from '@mui/material';
+// import { deletedEmployee } from 'renderer/utils/api-call/deleteEmployee';
 
-export default function CrudEmployee() {
-  const [employees, setEmployees] = useState([]);
-  const [reload, setReload] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [formData, setFormData] = useState({
+// const CrudEmployee = () => {
+//   const emptyEmployee = {
+//     lastname: '',
+//     firstname: '',
+//     email: '',
+//     phone: '',
+//     id_roles: '',
+//   };
+
+//   const [employees, setEmployees] = useState([]);
+//   const [employeeDialog, setEmployeeDialog] = useState(false);
+//   const [deleteEmployeesDialog, setDeleteEmployeesDialog] = useState(false);
+//   const [submitted, setSubmitted] = useState(false);
+//   const [employee, setEmployee] = useState(emptyEmployee);
+//   const [selectedEmployees, setSelectedEmployees] = useState([]);
+//   const [globalFilter, setGlobalFilter] = useState('');
+//   const toast = useRef(null);
+//   const dt = useRef(null);
+//   const [isLoad, setIsLoad] = useState(false);
+
+//   useEffect(() => {
+//     getAllEmployees()
+//       .then((res) => {
+//         if (res.data) {
+//           console.log(res.data);
+//           setEmployees(res.data);
+//         }
+//       })
+//       .finally(() => {
+//         setIsLoad(true);
+//       });
+//   }, [isLoad]);
+
+//   const validationSchema = Yup.object().shape({
+//     name: Yup.string().required('Le libellé est obligatoire'),
+//     purchasePrice: Yup.number()
+//       .positive('Le prix ne peut être inférieur à 0€')
+//       .required('Le prix est obligatoire'),
+//   });
+
+//   const formatCurrency = (value) => {
+//     return value.toLocaleString('fr-FR', {
+//       style: 'currency',
+//       currency: 'EUR',
+//     });
+//   };
+
+//   const openNew = () => {
+//     setEmployee(emptyEmployee);
+//     setSubmitted(false);
+//     setEmployeeDialog(true);
+//   };
+
+//   const hideDialog = () => {
+//     setSubmitted(false);
+//     setEmployeeDialog(false);
+//   };
+
+//   const hideDeleteEmployeeDialog = () => {
+//     setDeleteEmployeeDialog(false);
+//   };
+
+//   const hideDeleteEmployeesDialog = () => {
+//     setDeleteEmployeesDialog(false);
+//   };
+
+//   const saveEmployee = (values, id) => {
+//     const _employee = { ...values };
+//     if (id) {
+//       updateEmployee(id, _employee)
+//         .then((res) => {
+//           if (res.data.message === 'Mis à jour') {
+//             toast.current.show({
+//               severity: 'success',
+//               summary: 'Successful',
+//               detail: "L'employé a été mis à jour",
+//               life: 3000,
+//             });
+//             setEmployeeDialog(false);
+//             setIsLoad(false);
+//           }
+//         })
+//         .catch((error) => {
+//           toast.current.show({
+//             severity: 'danger',
+//             summary: 'Error',
+//             detail: "L'employé n'a pas été mis à jour",
+//             life: 3000,
+//           });
+//         });
+//     } else {
+//       createEmployee(_employee)
+//         .then((res) => {
+//           if (res.data.message === 'created') {
+//             toast.current.show({
+//               severity: 'success',
+//               summary: 'Successful',
+//               detail: "L'employé a bien été ajouté",
+//               life: 3000,
+//             });
+//             setEmployeeDialog(false);
+//             setIsLoad(false);
+//           }
+//         })
+//         .catch((error) => {
+//           toast.current.show({
+//             severity: 'danger',
+//             summary: 'Error',
+//             detail: "L'employé n'a pas été ajouté",
+//             life: 3000,
+//           });
+//         });
+//     }
+//   };
+
+//   const editEmployee = (employee) => {
+//     setEmployee({ ...employee });
+//     setEmployeeDialog(true);
+//   };
+
+//   const confirmDeleteEmployee = (employee) => {
+//     setEmployee(employee);
+//     setDeleteEmployeeDialog(true);
+//   };
+
+//   const deleteEmployee = (id) => {
+//     deletedEmployee(id)
+//       .then((res) => {
+//         if (res.status === 200) {
+//           const _employees = employees.filter(
+//             (item) => item.id !== employee.id
+//           );
+//           setEmployees(_employees);
+//           setDeleteEmployeeDialog(false);
+//           toast.current.show({
+//             severity: 'success',
+//             summary: 'Successful',
+//             detail: "L'employé a été supprimé",
+//             life: 3000,
+//           });
+//         }
+//       })
+//       .catch(() => {
+//         toast.current.show({
+//           severity: 'danger',
+//           summary: 'Error',
+//           detail: "L'employé n'a pas été supprimé",
+//           life: 3000,
+//         });
+//       });
+//   };
+
+//   const findIndexById = (id) => {
+//     let index = -1;
+
+//     for (let i = 0; i < employees.length; i++) {
+//       if (employees[i].id === id) {
+//         index = i;
+//         break;
+//       }
+//     }
+
+//     return index;
+//   };
+
+//   const exportCSV = () => {
+//     dt.current.exportCSV();
+//   };
+
+//   const confirmDeleteSelected = () => {
+//     setDeleteEmployeesDialog(true);
+//   };
+
+//   const deleteSelectedEmployees = () => {
+//     // Créez un tableau de promesses pour chaque suppression d'ingrédient
+//     const deletePromises = selectedEmployees.map((selectedEmployee) =>
+//       deleteEmployeeById(selectedIngredient.id)
+//     );
+
+//     // Exécutez toutes les suppressions en parallèle
+//     Promise.all(deletePromises)
+//       .then((responses) => {
+//         // Vérifiez si toutes les suppressions sont réussies (statut 200)
+//         const allDeleted = responses.every((res) => res.status === 200);
+
+//         if (allDeleted) {
+//           // Filtrer les ingrédients pour supprimer ceux qui ont été sélectionnés
+//           const _employees = employees.filter(
+//             (item) => !selectedEmployees.includes(item)
+//           );
+//           setEmployees(_employees);
+//           setDeleteEmployeeDialog(false);
+//           setSelectedEmployee(null); // Réinitialisez la sélection
+//           toast.current.show({
+//             severity: 'success',
+//             summary: 'Successful',
+//             detail: 'Employé(s) supprimé(s)',
+//             life: 3000,
+//           });
+//         } else {
+//           // Gérer les cas où certaines suppressions ont échoué
+//           toast.current.show({
+//             severity: 'danger',
+//             summary: 'Error',
+//             detail: 'Impossible de supprimer le/les employé(s)',
+//             life: 3000,
+//           });
+//         }
+//       })
+//       .catch(() => {
+//         // Gérer les erreurs d'API
+//         toast.current.show({
+//           severity: 'danger',
+//           summary: 'Error',
+//           detail: 'Impossible de supprimer le/les employé(s)',
+//           life: 3000,
+//         });
+//       });
+//   };
+
+//   const leftToolbarTemplate = () => {
+//     return (
+//       <div className="flex flex-wrap gap-2">
+//         <Button
+//           style={{
+//             marginRight: '6px',
+//             backgroundColor: '#4f7170',
+//             border: '1px solid #4f7170',
+//           }}
+//           label="Ajouter"
+//           icon="pi pi-plus"
+//           onClick={openNew}
+//         />
+//         <Button
+//           label="Supprimer"
+//           icon="pi pi-trash"
+//           severity="danger"
+//           onClick={confirmDeleteSelected}
+//           disabled={!selectedEmployees || !selectedEmployees.length}
+//         />
+//       </div>
+//     );
+//   };
+
+//   const rightToolbarTemplate = () => {
+//     return (
+//       <Button
+//         label="Export"
+//         style={{ backgroundColor: '#00656f', border: '1px solid #00656f' }}
+//         icon="pi pi-upload"
+//         className="p-button-help"
+//         onClick={exportCSV}
+//       />
+//     );
+//   };
+
+//   const firstnameBodyTemplate = (rowData) => {
+//     return <Typography variant="BUTTON TEXT">{rowData.firstname}</Typography>;
+//   };
+
+//   const lastnameBodyTemplate = (rowData) => {
+//     return <Typography variant="BUTTON TEXT">{rowData.lastname}</Typography>;
+//   };
+
+//   const emailBodyTemplate = (rowData) => {
+//     return <Typography variant="BUTTON TEXT">{rowData.email}</Typography>;
+//   };
+
+//   const phoneBodyTemplate = (rowData) => {
+//     return <Typography variant="BUTTON TEXT">{rowData.phone}</Typography>;
+//   };
+
+//   const roleBodyTemplate = (rowData) => {
+//     return <Typography variant="BUTTON TEXT">{rowData.roles.name}</Typography>;
+//   };
+
+//   const actionBodyTemplate = (rowData) => {
+//     return (
+//       <React.Fragment>
+//         <Button
+//           icon="pi pi-pencil"
+//           style={{ color: '#212830', marginRight: '6px' }}
+//           rounded
+//           outlined
+//           onClick={() => editEmployee(rowData)}
+//         />
+//         <Button
+//           icon="pi pi-trash"
+//           rounded
+//           outlined
+//           severity="danger"
+//           onClick={() => confirmDeleteEmployee(rowData)}
+//         />
+//       </React.Fragment>
+//     );
+//   };
+
+//   const header = (
+//     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+//       <h4 style={{ color: '#212830' }} className="m-0">
+//         Gestion des employés
+//       </h4>
+//       <span className="p-input-icon-left">
+//         <i className="pi pi-search" />
+//         <InputText
+//           type="search"
+//           onInput={(e) => setGlobalFilter(e.target.value)}
+//           placeholder="Search..."
+//         />
+//       </span>
+//     </div>
+//   );
+
+//   return (
+//     <div>
+//       <Toast ref={toast} />
+//       <div className="card">
+//         <Toolbar
+//           className="mb-4"
+//           left={leftToolbarTemplate}
+//           right={rightToolbarTemplate}
+//         ></Toolbar>
+//         <DataTable
+//           scrollable
+//           scrollHeight="50vh"
+//           ref={dt}
+//           value={employees}
+//           selection={selectedEmployees}
+//           onSelectionChange={(e) => setSelectedEmployees(e.value)}
+//           dataKey="id"
+//           paginator
+//           rows={10}
+//           rowsPerPageOptions={[5, 10, 25]}
+//           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+//           currentPageReportTemplate="Afficher {first} à {last} sur {totalRecords} employés"
+//           globalFilter={globalFilter}
+//           header={header}
+//         >
+//           <Column selectionMode="multiple" exportable={false}></Column>
+//           <Column
+//             field="firstname"
+//             header="Prénom"
+//             body={firstnameBodyTemplate}
+//             sortable
+//             style={{ minWidth: '12rem' }}
+//           ></Column>
+//           <Column
+//             field="name"
+//             header="Nom"
+//             body={lastnameBodyTemplate}
+//             sortable
+//             style={{ minWidth: '16rem' }}
+//           ></Column>
+//           <Column
+//             field="email"
+//             header="Email"
+//             body={emailBodyTemplate}
+//             sortable
+//             style={{ minWidth: '16rem' }}
+//           ></Column>
+//           <Column
+//             field="phone"
+//             header="Numéro"
+//             body={phoneBodyTemplate}
+//             sortable
+//             style={{ minWidth: '16rem' }}
+//           ></Column>
+//           <Column
+//             field="role"
+//             header="Rôle"
+//             body={roleBodyTemplate}
+//             sortable
+//             style={{ minWidth: '16rem' }}
+//           ></Column>
+//           <Column
+//             body={actionBodyTemplate}
+//             exportable={false}
+//             style={{ minWidth: '12rem' }}
+//           ></Column>
+//         </DataTable>
+//       </div>
+
+//       {/* Modal details et modif */}
+//       <Dialog
+//         visible={employeeDialog}
+//         style={{ width: '32rem' }}
+//         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+//         header="Détails de l'employé"
+//         modal
+//         className="p-fluid"
+//         onHide={hideDialog}
+//       >
+//         <Formik
+//           initialValues={{
+//             id_roles: employee.id_roles,
+//             firstname: employee.firstname,
+//             lastname: employee.lastname,
+//             email: employee.email,
+//             phone: employee.phone,
+//           }}
+//           validationSchema={validationSchema}
+//           onSubmit={(values) => {
+//             saveEmployee(values, employee.id);
+//           }}
+//         >
+//           {({
+//             values,
+//             handleChange,
+//             handleSubmit,
+//             errors,
+//             touched,
+//             isSubmitting,
+//           }) => {
+//             return (
+//               <Form>
+//                 <TextField
+//                   value={values.name}
+//                   onChange={handleChange}
+//                   label="Libellé"
+//                   id="name"
+//                   name="name"
+//                   type="text"
+//                   sx={{ m: 1, width: '100%' }}
+//                 />
+//                 <ErrorMessage name="name" />
+
+//                 <TextField
+//                   value={values.purchasePrice}
+//                   onChange={handleChange}
+//                   label="Prix"
+//                   id="purchasePrice"
+//                   name="purchasePrice"
+//                   type="number"
+//                   sx={{ m: 1, width: '100%' }}
+//                   InputProps={{
+//                     endAdornment: (
+//                       <InputAdornment position="end">€</InputAdornment>
+//                     ),
+//                     inputProps: { min: 0 },
+//                   }}
+//                 />
+//                 <ErrorMessage name="purchasePrice" />
+//                 <Box
+//                   sx={{
+//                     display: 'flex',
+//                     justifyContent: 'space-between',
+//                     marginTop: '10px',
+//                   }}
+//                 >
+//                   <Button
+//                     style={{
+//                       marginRight: '10px',
+//                       color: '#4f7170',
+//                       border: '1px solid #4f7170',
+//                     }}
+//                     label="Annuler"
+//                     icon="pi pi-times"
+//                     outlined
+//                     onClick={hideDialog}
+//                   />
+//                   <Button
+//                     style={{
+//                       backgroundColor: '#4f7170',
+//                       border: '1px solid #4f7170',
+//                     }}
+//                     label="Sauvegarder"
+//                     type="submit"
+//                     icon="pi pi-check"
+//                     onClick={handleSubmit}
+//                   />
+//                 </Box>
+//               </Form>
+//             );
+//           }}
+//         </Formik>
+//       </Dialog>
+
+//       {/* Modal delete employee */}
+//       <Dialog
+//         visible={deleteEmployeesDialog}
+//         style={{ width: '32rem' }}
+//         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+//         header="Valider"
+//         modal
+//         onHide={hideDeleteEmployeeDialog}
+//       >
+//         <div className="confirmation-content">
+//           <i
+//             className="pi pi-exclamation-triangle mr-3"
+//             style={{ fontSize: '2rem' }}
+//           />
+//           {employee && (
+//             <span>
+//               {' '}
+//               Êtes-vous sûr de vouloir supprimer <b>{employee.name}</b>?
+//             </span>
+//           )}
+//         </div>
+//         <Box
+//           sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+//         >
+//           <Button
+//             style={{
+//               marginRight: '10px',
+//               color: '#4f7170',
+//               border: '1px solid #4f7170',
+//             }}
+//             label="Non"
+//             icon="pi pi-times"
+//             outlined
+//             onClick={hideDeleteEmployeeDialog}
+//           />
+//           <Button
+//             label="Oui"
+//             icon="pi pi-check"
+//             severity="danger"
+//             onClick={() => deleteEmployee(employee.id)}
+//           />
+//         </Box>
+//       </Dialog>
+
+//       {/* Modal delete selection employee */}
+//       <Dialog
+//         visible={deleteEmployeesDialog}
+//         style={{ width: '32rem' }}
+//         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+//         header="Valider"
+//         modal
+//         onHide={hideDeleteEmployeesDialog}
+//       >
+//         <div className="confirmation-content">
+//           <i
+//             className="pi pi-exclamation-triangle mr-3"
+//             style={{ fontSize: '2rem' }}
+//           />
+//           {employee && (
+//             <span> Êtes-vous sûr de vouloir supprimer l'employé ?</span>
+//           )}
+//         </div>
+//         <Box
+//           sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+//         >
+//           <Button
+//             style={{
+//               marginRight: '10px',
+//               color: '#4f7170',
+//               border: '1px solid #4f7170',
+//             }}
+//             label="Non"
+//             icon="pi pi-times"
+//             outlined
+//             onClick={hideDeleteEmployeesDialog}
+//           />
+//           <Button
+//             label="Oui"
+//             icon="pi pi-check"
+//             severity="danger"
+//             onClick={deleteSelectedEmployees}
+//           />
+//         </Box>
+//       </Dialog>
+//     </div>
+//   );
+// };
+
+// export default CrudEmployee;
+
+import React, { useState, useEffect, useRef } from 'react';
+import './CrudEmployee.css';
+import { DataTable } from 'primereact/datatable';
+import { classNames } from 'primereact/utils';
+import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
+import { FileUpload } from 'primereact/fileupload';
+import { Rating } from 'primereact/rating';
+import { Toolbar } from 'primereact/toolbar';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { RadioButton } from 'primereact/radiobutton';
+import { InputNumber } from 'primereact/inputnumber';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+import { Tag } from 'primereact/tag';
+import { Badge } from 'primereact/badge';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
+import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
+import { createEmployee } from 'renderer/utils/api-call/createEmployee';
+import { Box, InputAdornment, TextField, Typography } from '@mui/material';
+import { deletedEmployee } from 'renderer/utils/api-call/deleteEmployee';
+
+const CrudEmployee = () => {
+  const emptyEmployee = {
     lastname: '',
     firstname: '',
     email: '',
     phone: '',
-    id_roles: 1,
+    id_roles: '',
+  };
+
+  // ... (other state variables and useEffect)
+
+  const validationSchema = Yup.object().shape({
+    firstname: Yup.string().required('Le prénom est obligatoire'),
+    lastname: Yup.string().required('Le nom est obligatoire'),
+    // ... (other validation fields)
   });
 
-  const roles = {
-    1: 'Préparateur de commande',
-    2: 'Cuisinier',
-    3: 'Manager',
-    4: 'Gérant',
+  // ... (other methods and components)
+
+  const findIndexById = (id) => {
+    let index = -1;
+    employees.forEach((employee, i) => {
+      // Fixed: Use 'i' as the index
+      if (employees[i].id === id) {
+        index = i;
+      }
+    });
+    return index;
   };
 
-  const roleTemplate = (rowData) => {
-    return roles[rowData.id_roles] || 'Role non défini';
-  };
+  // ... (other methods and components)
 
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [employeeDialog, setEmployeeDialog] = useState(false);
+  const [deleteEmployeesDialog, setDeleteEmployeesDialog] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [employee, setEmployee] = useState(emptyEmployee);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const toast = useRef(null);
+  const dt = useRef(null);
+  const [isLoad, setIsLoad] = useState(false);
 
   useEffect(() => {
-    if (reload) {
-      setReload(false);
-    }
-    getAllEmployees().then((data) => {
-      setEmployees(data.data);
-    });
-  }, [reload]);
-
-  const formContainerStyles = {
-    maxHeight: '500px',
-    overflowY: 'auto',
-    padding: '1em',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    margin: '1em 0',
-    alignSelf: 'center',
-  };
-
-  // Mise en place du scroll pour le CRUD
-  const ScrollCrud = () => {
-    return (
-      <div
-        style={{
-          overflow: 'auto',
-          width: '110%',
-          height: '600px',
-          marginTop: 10,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '20%',
-            marginBottom: 30,
-          }}
-        >
-          <div className="formContainerStyles">
-            {createForm}
-            {editForm}
-          </div>
-        </div>
-        <div className="card">
-          <DataTable value={employees} tableStyle={{ minWidth: '50rem' }}>
-            <Column
-              field="id"
-              header="Id"
-              style={{ color: 'blue', fontWeight: 'bold' }}
-            ></Column>
-            <Column field="lastname" header="Nom"></Column>
-            <Column field="firstname" header="Prénom"></Column>
-            <Column
-              field="id_roles"
-              style={{ color: 'green', fontWeight: 'bold' }}
-              header="Rôle"
-              body={roleTemplate}
-            ></Column>
-            <Column field="email" header="Email"></Column>
-            <Column field="phone" header="Téléphone"></Column>
-            <Column header="Modifier" body={editButtonTemplate}></Column>
-            <Column header="Supprimer" body={deleteButtonTemplate}></Column>
-          </DataTable>
-        </div>
-
-        <IconButton onClick={handleShowCreateForm}>
-          <AddCircleIcon
-            style={{ color: 'blue', fontSize: '40', alignSelf: 'center' }}
-          />{' '}
-        </IconButton>
-        <span style={{ color: 'blue', fontWeight: 'bold', fontSize: 20 }}>
-          Ajouter un employé
-        </span>
-      </div>
-    );
-  };
-  // ------------------------------------------------------
-
-  // Fonction pour gérer la création d'un nouvel employé
-  const handleCreateEmployee = () => {
-    addEmployee(formData).finally(() => {
-      setReload(true);
-      setShowCreateForm(false);
-      setFormData({
-        lastname: '',
-        firstname: '',
-        id_roles: '',
-        email: '',
-        phone: '',
+    getAllEmployees()
+      .then((res) => {
+        if (res.data) {
+          console.log(res.data);
+          setEmployees(res.data);
+        }
+      })
+      .finally(() => {
+        setIsLoad(true);
       });
-    });
-  };
-  // ------------------------------------------------------
+  }, [isLoad]);
 
-  // Fonction pour modifier un employé en fonction de son ID
-  const handleEditEmployee = (id, updatedEmployee) => {
-    // Trouver l'employé correspondant à l'ID dans le tableau 'employees'
-    updateEmployee(id, updatedEmployee).finally(() => {
-      setReload(true);
-      setShowEditForm(false);
-      setFormData({
-        lastname: '',
-        firstname: '',
-        id_roles: '',
-        email: '',
-        phone: '',
-      });
+  const formatCurrency = (value) => {
+    return value.toLocaleString('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
     });
   };
 
-  // Appeler l'API pour mettre à jour l'employé
-  // updateEmployee(id, updatedEmployee).finally(() => {
-  //   setReload(true);
-  // });
-
-  // console.log(`Modifier l'employé avec l'ID : ${id}`);
-
-  // ------------------------------------------------------
-
-  // Fonction pour supprimer un employé en fonction de son ID
-  const handleDeleteEmployee = (id) => {
-    setEmployeeToDelete(id);
-    setShowConfirmDialog(true);
+  const openNew = () => {
+    setEmployee(emptyEmployee);
+    setSubmitted(false);
+    setEmployeeDialog(true);
   };
 
-  const confirmDeleteEmployee = () => {
-    deleteEmployee(employeeToDelete).then(() => {
-      setReload(true);
-    });
-    console.log(`Supprimer l'employé avec l'ID : ${employeeToDelete}`);
-    setShowConfirmDialog(false);
+  const hideDialog = () => {
+    setSubmitted(false);
+    setEmployeeDialog(false);
   };
 
-  const cancelDeleteEmployee = () => {
-    setShowConfirmDialog(false);
+  const hideDeleteEmployeeDialog = () => {
+    setDeleteEmployeeDialog(false);
   };
 
-  const deleteConfirmDialog = (
-    <Dialog
-      visible={showConfirmDialog}
-      style={{ width: '450px' }}
-      header="Confirmation"
-      modal
-      onHide={() => setShowConfirmDialog(false)}
-      footer={
-        <div>
-          <Button
-            onClick={confirmDeleteEmployee}
-            color="primary"
-            variant="contained"
-            style={{ backgroundColor: 'green' }}
-          >
-            Oui
-          </Button>
-          <Button
-            onClick={cancelDeleteEmployee}
-            color="secondary"
-            variant="contained"
-            style={{ marginLeft: '10px', backgroundColor: 'red' }}
-          >
-            Non
-          </Button>
-        </div>
-      }
-    >
-      <div className="confirmation-content">
-        <i
-          className="pi pi-exclamation-triangle p-mr-3"
-          style={{ fontSize: '2rem' }}
-        />
-        <span>Êtes-vous sûr de vouloir supprimer cet employé ?</span>
-      </div>
-    </Dialog>
-  );
-
-  // ------------------------------------------------------
-
-  // Fonction pour gérer l'affichage du formulaire de création
-  const handleShowCreateForm = () => {
-    setShowCreateForm(true);
+  const hideDeleteEmployeesDialog = () => {
+    setDeleteEmployeesDialog(false);
   };
-  // ------------------------------------------------------
 
-  // Fonction pour gérer l'affichage du formulaire de modification
-  const handleShowEditForm = (id) => {
-    const employeeToUpdate = employees.find((employee) => employee.id === id);
-
-    if (!employeeToUpdate) {
-      console.error(`Employé avec l'ID ${id} introuvable.`);
+  const saveEmployee = (values, id) => {
+    const _employee = { ...values };
+    if (id) {
+      updateEmployee(id, _employee)
+        .then((res) => {
+          if (res.data?.message === 'Mis à jour') {
+            toast.current.show({
+              severity: 'success',
+              summary: 'Successful',
+              detail: "L'employé a été mis à jour",
+              life: 3000,
+            });
+            setEmployeeDialog(false);
+            setIsLoad(false);
+          }
+        })
+        .catch((error) => {
+          toast.current.show({
+            severity: 'danger',
+            summary: 'Error',
+            detail: "L'employé n'a pas été mis à jour",
+            life: 3000,
+          });
+        });
     } else {
-      setShowEditForm(true);
-      setFormData(employeeToUpdate);
+      createEmployee(_employee)
+        .then((res) => {
+          if (res.data?.message === 'created') {
+            toast.current.show({
+              severity: 'success',
+              summary: 'Successful',
+              detail: "L'employé a bien été ajouté",
+              life: 3000,
+            });
+            setEmployeeDialog(false);
+            setIsLoad(false);
+          }
+        })
+        .catch((error) => {
+          toast.current.show({
+            severity: 'danger',
+            summary: 'Error',
+            detail: "L'employé n'a pas été ajouté",
+            life: 3000,
+          });
+        });
     }
   };
-  // ------------------------------------------------------
 
-  // Fonction pour gérer les changements de saisie dans les formulaires
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  const editEmployee = (employee) => {
+    setEmployee({ ...employee });
+    setEmployeeDialog(true);
   };
-  // ------------------------------------------------------
 
-  // Template pour le bouton de modification
-  const editButtonTemplate = (rowData) => {
+  const confirmDeleteEmployee = (employee) => {
+    setEmployee(employee);
+    setDeleteEmployeesDialog(true);
+  };
+
+  const deleteEmployee = (id) => {
+    console.log(id);
+    deletedEmployee(id)
+      .then((res) => {
+        if (res.status === 200) {
+          const _employees = employees.filter(
+            (item) => item.id !== employee.id
+          );
+          setEmployees(_employees);
+          setDeleteEmployeesDialog(false);
+          toast.current.show({
+            severity: 'success',
+            summary: 'Successful',
+            detail: "L'employé a été supprimé",
+            life: 3000,
+          });
+        }
+      })
+      .catch(() => {
+        toast.current.show({
+          severity: 'danger',
+          summary: 'Error',
+          detail: "L'employé n'a pas été supprimé",
+          life: 3000,
+        });
+      });
+  };
+
+  const exportCSV = () => {
+    dt.current.exportCSV();
+  };
+
+  const confirmDeleteSelected = () => {
+    setDeleteEmployeesDialog(true);
+  };
+
+  const deleteSelectedEmployees = () => {
+    // Créez un tableau de promesses pour chaque suppression d'ingrédient
+    const deletePromises = selectedEmployees.map((selectedEmployee) =>
+      deleteEmployee(selectedEmployee.id)
+    );
+
+    // Exécutez toutes les suppressions en parallèle
+    Promise.all(deletePromises)
+      .then((responses) => {
+        // Vérifiez si toutes les suppressions sont réussies (statut 200)
+        const allDeleted = responses.every((res) => res.status === 200);
+
+        if (allDeleted) {
+          // Filtrer les ingrédients pour supprimer ceux qui ont été sélectionnés
+          const _employees = employees.filter(
+            (item) => !selectedEmployees.includes(item)
+          );
+          setEmployees(_employees);
+          setDeleteEmployeeDialog(false);
+          setSelectedEmployee(null); // Réinitialisez la sélection
+          toast.current.show({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Employé(s) supprimé(s)',
+            life: 3000,
+          });
+        } else {
+          // Gérer les cas où certaines suppressions ont échoué
+          toast.current.show({
+            severity: 'danger',
+            summary: 'Error',
+            detail: 'Impossible de supprimer le/les employé(s)',
+            life: 3000,
+          });
+        }
+      })
+      .catch(() => {
+        // Gérer les erreurs d'API
+        toast.current.show({
+          severity: 'danger',
+          summary: 'Error',
+          detail: 'Impossible de supprimer le/les employé(s)',
+          life: 3000,
+        });
+      });
+  };
+
+  const leftToolbarTemplate = () => {
     return (
-      // <Button
-      //   variant="contained"
-      //   color="primary"
-      //   icon="pi pi-pencil"
-      //   rounded={true}
-      //   aria-label="Modifier"
-      //   style={{ backgroundColor: 'orange', color: 'white' }}
-      //   onClick={() => handleShowEditForm(rowData.id)}
-      // >
-      //   Modifier
-      // </Button>
-      <IconButton
-        color="primary"
-        onClick={() => handleShowEditForm(rowData.id)}
-      >
-        <EditIcon style={{ color: 'orange' }} />
-      </IconButton>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          style={{
+            marginRight: '6px',
+            backgroundColor: '#4f7170',
+            border: '1px solid #4f7170',
+          }}
+          label="Ajouter"
+          icon="pi pi-plus"
+          onClick={openNew}
+        />
+        <Button
+          label="Supprimer"
+          icon="pi pi-trash"
+          severity="danger"
+          onClick={confirmDeleteSelected}
+          disabled={!selectedEmployees || !selectedEmployees.length}
+        />
+      </div>
     );
   };
-  // ------------------------------------------------------
 
-  // Template pour le bouton de suppression
-  const deleteButtonTemplate = (rowData) => {
+  const rightToolbarTemplate = () => {
     return (
-      // <Button
-      //   icon="pi pi-times"
-      //   rounded={true}
-      //   severity="danger"
-      //   aria-label="Supprimer"
-      //   variant="contained"
-      //   style={{ backgroundColor: 'red', color: 'white' }}
-      //   color="secondary"
-      //   onClick={() => handleDeleteEmployee(rowData.id)}
-      // >
-      //   Supprimer
-      // </Button>
-      <IconButton
-        color="secondary"
-        onClick={() => handleDeleteEmployee(rowData.id)}
-      >
-        <DeleteIcon style={{ color: 'red' }} />
-      </IconButton>
+      <Button
+        label="Export"
+        style={{ backgroundColor: '#00656f', border: '1px solid #00656f' }}
+        icon="pi pi-upload"
+        className="p-button-help"
+        onClick={exportCSV}
+      />
     );
   };
-  // ------------------------------------------------------
 
-  // Formulaire de création
+  const firstnameBodyTemplate = (rowData) => {
+    return <Typography variant="BUTTON TEXT">{rowData.firstname}</Typography>;
+  };
 
-  const createForm = showCreateForm && (
-    <div>
-      <h2>Créer un nouvel employé</h2>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="lastname"
-            label="Nom"
-            fullWidth
-            variant="outlined"
-            value={formData.lastname}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="firstname"
-            label="Prénom"
-            fullWidth
-            variant="outlined"
-            value={formData.firstname}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="id_roles"
-            label="Rôle"
-            fullWidth
-            variant="outlined"
-            value={formData.id_roles}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="email"
-            label="Email"
-            fullWidth
-            variant="outlined"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="phone"
-            label="Téléphone"
-            fullWidth
-            variant="outlined"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={handleCreateEmployee}
-          >
-            Enregistrer
-          </Button>
-        </Grid>
-      </Grid>
+  const lastnameBodyTemplate = (rowData) => {
+    return <Typography variant="BUTTON TEXT">{rowData.lastname}</Typography>;
+  };
+
+  const emailBodyTemplate = (rowData) => {
+    return <Typography variant="BUTTON TEXT">{rowData.email}</Typography>;
+  };
+
+  const phoneBodyTemplate = (rowData) => {
+    return <Typography variant="BUTTON TEXT">{rowData.phone}</Typography>;
+  };
+
+  const roleBodyTemplate = (rowData) => {
+    return <Typography variant="BUTTON TEXT">{rowData.roles.name}</Typography>;
+  };
+
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        <Button
+          icon="pi pi-pencil"
+          style={{ color: '#212830', marginRight: '6px' }}
+          rounded
+          outlined
+          onClick={() => editEmployee(rowData)}
+        />
+        <Button
+          icon="pi pi-trash"
+          rounded
+          outlined
+          severity="danger"
+          onClick={() => confirmDeleteEmployee(rowData)}
+        />
+      </React.Fragment>
+    );
+  };
+
+  const header = (
+    <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
+      <h4 style={{ color: '#212830' }} className="m-0">
+        Gestion des employés
+      </h4>
+      <span className="p-input-icon-left">
+        <i className="pi pi-search" />
+        <InputText
+          type="search"
+          onInput={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search..."
+        />
+      </span>
     </div>
   );
-  // ------------------------------------------------------
-
-  // Formulaire de modification
-
-  const editForm = showEditForm && (
-    <div>
-      <h2>Modifier l'employé</h2>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="lastname"
-            label="Nom"
-            fullWidth
-            variant="outlined"
-            value={formData.lastname}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="firstname"
-            label="Prénom"
-            fullWidth
-            variant="outlined"
-            value={formData.firstname}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="id_roles"
-            label="Rôle"
-            fullWidth
-            variant="outlined"
-            value={formData.id_roles}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="email"
-            label="Email"
-            fullWidth
-            variant="outlined"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="phone"
-            label="Téléphone"
-            fullWidth
-            variant="outlined"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={() => handleEditEmployee(formData.id, formData)}
-          >
-            Enregistrer
-          </Button>
-        </Grid>
-      </Grid>
-    </div>
-  );
-  // ------------------------------------------------------
 
   return (
-    <div
-      style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <ScrollCrud />
-      {deleteConfirmDialog}
-      {/* <Button
-        style={{
-          marginBottom: 20,
-          marginLeft: 420,
-          backgroundColor: 'blue',
-          color: 'white',
-        }}
-        variant="contained"
-        color="primary"
-        onClick={handleShowCreateForm}
+    <div>
+      <Toast ref={toast} />
+      <div className="card">
+        <Toolbar
+          className="mb-4"
+          left={leftToolbarTemplate}
+          right={rightToolbarTemplate}
+        ></Toolbar>
+        <DataTable
+          scrollable
+          scrollHeight="50vh"
+          ref={dt}
+          value={employees}
+          selection={selectedEmployees}
+          onSelectionChange={(e) => setSelectedEmployees(e.value)}
+          dataKey="id"
+          paginator
+          rows={10}
+          rowsPerPageOptions={[5, 10, 25]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Afficher {first} à {last} sur {totalRecords} employés"
+          globalFilter={globalFilter}
+          header={header}
+        >
+          <Column selectionMode="multiple" exportable={false}></Column>
+          <Column
+            field="firstname"
+            header="Prénom"
+            body={firstnameBodyTemplate}
+            sortable
+            style={{ minWidth: '12rem' }}
+          ></Column>
+          <Column
+            field="name"
+            header="Nom"
+            body={lastnameBodyTemplate}
+            sortable
+            style={{ minWidth: '16rem' }}
+          ></Column>
+          <Column
+            field="email"
+            header="Email"
+            body={emailBodyTemplate}
+            sortable
+            style={{ minWidth: '16rem' }}
+          ></Column>
+          <Column
+            field="phone"
+            header="Numéro"
+            body={phoneBodyTemplate}
+            sortable
+            style={{ minWidth: '16rem' }}
+          ></Column>
+          <Column
+            field="role"
+            header="Rôle"
+            body={roleBodyTemplate}
+            sortable
+            style={{ minWidth: '16rem' }}
+          ></Column>
+          <Column
+            body={actionBodyTemplate}
+            exportable={false}
+            style={{ minWidth: '12rem' }}
+          ></Column>
+        </DataTable>
+      </div>
+
+      {/* Modal details et modif */}
+      <Dialog
+        visible={employeeDialog}
+        style={{ width: '32rem' }}
+        breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+        header="Détails de l'employé"
+        modal
+        className="p-fluid"
+        onHide={hideDialog}
       >
-        Créer un nouvel employé
-      </Button> */}
+        <Formik
+          initialValues={{
+            id_roles: employee.id_roles,
+            firstname: employee.firstname,
+            lastname: employee.lastname,
+            email: employee.email,
+            phone: employee.phone,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => {
+            saveEmployee(values, employee.id);
+          }}
+        >
+          {({
+            values,
+            handleChange,
+            handleSubmit,
+            errors,
+            touched,
+            isSubmitting,
+          }) => {
+            return (
+              <Form>
+                <TextField
+                  value={values.name}
+                  onChange={handleChange}
+                  label="Libellé"
+                  id="name"
+                  name="name"
+                  type="text"
+                  sx={{ m: 1, width: '100%' }}
+                />
+                <ErrorMessage name="name" />
+
+                <TextField
+                  value={values.purchasePrice}
+                  onChange={handleChange}
+                  label="Prix"
+                  id="purchasePrice"
+                  name="purchasePrice"
+                  type="number"
+                  sx={{ m: 1, width: '100%' }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">€</InputAdornment>
+                    ),
+                    inputProps: { min: 0 },
+                  }}
+                />
+                <ErrorMessage name="purchasePrice" />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '10px',
+                  }}
+                >
+                  <Button
+                    style={{
+                      marginRight: '10px',
+                      color: '#4f7170',
+                      border: '1px solid #4f7170',
+                    }}
+                    label="Annuler"
+                    icon="pi pi-times"
+                    outlined
+                    onClick={hideDialog}
+                  />
+                  <Button
+                    style={{
+                      backgroundColor: '#4f7170',
+                      border: '1px solid #4f7170',
+                    }}
+                    label="Sauvegarder"
+                    type="submit"
+                    icon="pi pi-check"
+                    onClick={handleSubmit}
+                  />
+                </Box>
+              </Form>
+            );
+          }}
+        </Formik>
+      </Dialog>
+
+      {/* Modal delete employee */}
+      <Dialog
+        visible={deleteEmployeesDialog}
+        style={{ width: '32rem' }}
+        breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+        header="Valider"
+        modal
+        onHide={hideDeleteEmployeeDialog}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: '2rem' }}
+          />
+          {employee && (
+            <span>
+              {' '}
+              Êtes-vous sûr de vouloir supprimer <b>{employee.name}</b>?
+            </span>
+          )}
+        </div>
+        <Box
+          sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+        >
+          <Button
+            style={{
+              marginRight: '10px',
+              color: '#4f7170',
+              border: '1px solid #4f7170',
+            }}
+            label="Non"
+            icon="pi pi-times"
+            outlined
+            onClick={hideDeleteEmployeeDialog}
+          />
+          <Button
+            label="Oui"
+            icon="pi pi-check"
+            severity="danger"
+            onClick={() => deleteEmployee(employee.id)}
+          />
+        </Box>
+      </Dialog>
+
+      {/* Modal delete selection employee */}
+      <Dialog
+        visible={deleteEmployeesDialog}
+        style={{ width: '32rem' }}
+        breakpoints={{ '960px': '75vw', '641px': '90vw' }}
+        header="Valider"
+        modal
+        onHide={hideDeleteEmployeesDialog}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle mr-3"
+            style={{ fontSize: '2rem' }}
+          />
+          {employee && (
+            <span> Êtes-vous sûr de vouloir supprimer l'employé ?</span>
+          )}
+        </div>
+        <Box
+          sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+        >
+          <Button
+            style={{
+              marginRight: '10px',
+              color: '#4f7170',
+              border: '1px solid #4f7170',
+            }}
+            label="Non"
+            icon="pi pi-times"
+            outlined
+            onClick={hideDeleteEmployeesDialog}
+          />
+          <Button
+            label="Oui"
+            icon="pi pi-check"
+            severity="danger"
+            onClick={deleteSelectedEmployees}
+          />
+        </Box>
+      </Dialog>
     </div>
   );
-}
+};
+
+export default CrudEmployee;
