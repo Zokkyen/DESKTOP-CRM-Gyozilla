@@ -276,7 +276,6 @@ export default function Ca() {
       setData(res.data.data);
       setIsLoading(false);
     } else {
-      console.log('res is not in expected format: ', res);
       setIsLoading(false);
     }
   };

@@ -162,8 +162,6 @@ function OrderCard({ order, setOrdersData, toast }) {
 
   // recuperation du hook personnalisé pour le compte a rebours
   const remainingTime = useCountdown(order.createdAt);
-  // const remainingTime = '15:00';
-
   let iconElapsedColor = 'black';
 
   if (remainingTime) {
@@ -174,7 +172,6 @@ function OrderCard({ order, setOrdersData, toast }) {
   }
 
   const productInOrders = order.order_lines[0].products;
-  // console.log('order.order_lines', order.order_lines);
   const result = [];
   let stopPlats = 0;
   let stopEntrees = 0;
@@ -280,8 +277,6 @@ function OrderCard({ order, setOrdersData, toast }) {
       </Box>
     );
   });
-  console.log('remainingTime', remainingTime);
-  console.log('orderinorder', order);
   return (
     <Card
       sx={{
@@ -441,12 +436,7 @@ function OrdersPage() {
         console.error('Erreur lors de la récupération des orders :', error);
       }
     };
-
     fetchOrdersData();
-    // const socket = io();
-    // socket.on('dataInsert', () => {
-    //   console.log('nouvelleDonnées');
-    // });
   }, []);
 
   // Calcule le nombre de commandes en cours
