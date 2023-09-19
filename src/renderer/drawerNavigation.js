@@ -54,6 +54,7 @@ const arrayNavigation = [
   {
     label: 'Ingrédients',
     icon: <InventoryIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudIngredient onLinkClick={callback} />,
     },
@@ -61,6 +62,7 @@ const arrayNavigation = [
   {
     label: 'Employés',
     icon: <PersonIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudEmployee onLinkClick={callback} />,
     },
@@ -84,7 +86,7 @@ const arrayNavigation = [
   {
     label: 'Commandes',
     icon: <ChecklistIcon />,
-    roles: [3, 4],
+    roles: [1, 3, 4],
     component: {
       callback: ({ callback }) => <OrdersPage onLinkClick={callback} />,
     },
