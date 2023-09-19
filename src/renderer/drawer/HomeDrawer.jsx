@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useContext, useState } from 'react';
 import { useTheme, styled } from '@mui/material/styles';
@@ -18,13 +20,17 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import arrayNavigation from 'renderer/drawerNavigation';
+import arrayNavigation, {
+  getNavigationItemsForRole,
+} from 'renderer/drawerNavigation';
 import Main from 'component/Main';
 import AppBar from 'component/AppBar';
 import DrawerHeader from 'component/DrawerHeader';
 import { useNavigate } from 'react-router-dom';
 import icon from '../../../assets/icon.png';
 import { UserContext } from '../utils/context/UserContext';
+
+export const TabContext = React.createContext();
 
 const drawerWidth = 240;
 
@@ -63,11 +69,14 @@ const StyledMenu = styled((props) => (
 
 export default function HomeDrawer() {
   const { user, logOut } = useContext(UserContext);
+  // const itemsToShow = getNavigationItemsForRole(user.role);
+  const itemsToShow = getNavigationItemsForRole(4);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const [selectedItem, setSelectedItem] = useState(arrayNavigation[0]);
-  const [mainContent, setMainContent] = useState(null); // État pour suivre le contenu du MAIN
+  const [mainContent, setMainContent] = useState(null);
+  const [selectedTab, setSelectedTab] = useState('defaultTab');
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -97,7 +106,6 @@ export default function HomeDrawer() {
     setMainContent(component);
   };
 
-  // Fonction callback qui renverra handleComponentLinkClick
   const callback = (component) => {
     handleComponentLinkClick(component);
   };
@@ -113,10 +121,15 @@ export default function HomeDrawer() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <CssBaseline />
-      <AppBar position="fixed">
-        <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <AppBar position="fixed" sx={{ height: '10vh' }}>
+        <Toolbar
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -186,7 +199,7 @@ export default function HomeDrawer() {
           </IconButton>
         </DrawerHeader>
         <List>
-          {arrayNavigation.map((item) => (
+          {itemsToShow.map((item) => (
             <ListItem
               key={`item${Math.random(3)}`}
               disablePadding
@@ -202,10 +215,11 @@ export default function HomeDrawer() {
           ))}
         </List>
       </Drawer>
-      <Main open={open}>
-        {/* Utilisez le composant component.callback pour transmettre la fonction callback à drawerNavigation */}
-        {mainContent || selectedItem.component.callback({ callback })}
-      </Main>
+      <TabContext.Provider value={selectedTab}>
+        <Main open={open} sx={{ minHeight: '90vh', marginTop: '10vh' }}>
+          {mainContent || selectedItem.component.callback({ callback })}
+        </Main>
+      </TabContext.Provider>
     </Box>
   );
 }

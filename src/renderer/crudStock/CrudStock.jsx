@@ -1,4 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable no-undef */
+/* eslint-disable promise/catch-or-return */
+/* eslint-disable no-plusplus */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable promise/always-return */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import './crudStock.css';
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
@@ -15,10 +24,11 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import { Badge } from 'primereact/badge';
-import { getAllIngredients } from 'renderer/utils/api-call/getAllIngredients';
 import { Box, InputAdornment, TextField, Typography } from '@mui/material';
 import { ErrorMessage, Form, Formik } from 'formik';
 import * as Yup from 'yup';
+import { Dropdown } from 'primereact/dropdown';
+import { getAllIngredients } from 'renderer/utils/api-call/getAllIngredients';
 import { updatedIngredientById } from 'renderer/utils/api-call/updatedIngredientById';
 import { createdIngredient } from 'renderer/utils/api-call/createdIngredient';
 import { deleteIngredientById } from 'renderer/utils/api-call/deleteIngredient';
@@ -26,9 +36,9 @@ import { getStockByFranchise } from 'renderer/utils/api-call/getStockByFranchise
 import { deleteStockById } from 'renderer/utils/api-call/deleteStockById';
 import { updateStocktById } from 'renderer/utils/api-call/updateStockById';
 import { createdStock } from 'renderer/utils/api-call/createdStock';
-import { Dropdown } from 'primereact/dropdown';
+import { UserContext } from '../utils/context/UserContext';
 
-const CrudStock = () => {
+function CrudStock() {
   const emptyStock = {
     id_franchises: '',
     id_ingredients: '',
@@ -46,10 +56,10 @@ const CrudStock = () => {
   const toast = useRef(null);
   const dt = useRef(null);
   const [isLoad, setIsLoad] = useState(false);
+  const { user } = useContext(UserContext);
 
-  const id = 2;
   useEffect(() => {
-    getStockByFranchise(id)
+    getStockByFranchise(user.franchise)
       .then((res) => {
         if (res.data) {
           setStocks(res.data);
@@ -58,7 +68,7 @@ const CrudStock = () => {
       .finally(() => {
         setIsLoad(true);
       });
-  }, [isLoad]);
+  }, [isLoad, user.franchise]);
 
   useEffect(() => {
     getAllIngredients()
@@ -99,7 +109,6 @@ const CrudStock = () => {
   const saveStock = (values, id) => {
     const _stock = { ...values };
     if (id) {
-      console.log(_stock);
       updateStocktById(_stock, id)
         .then((res) => {
           if (res.data.message === 'Mis à jour') {
@@ -136,24 +145,12 @@ const CrudStock = () => {
           }
         })
         .catch((error) => {
-          if (
-            error.response.data.message == "L'élément du stock existe déjà."
-          ) {
-            toast.current.show({
-              severity: 'danger',
-              summary: 'Error',
-              detail: "L'element du stock existe déjà.",
-              life: 3000,
-            });
-            setStockDialog(false);
-          } else {
-            toast.current.show({
-              severity: 'danger',
-              summary: 'Error',
-              detail: "L'element n'a pas été ajouté",
-              life: 3000,
-            });
-          }
+          toast.current.show({
+            severity: 'danger',
+            summary: 'Error',
+            detail: "L'element n'a pas été ajouté",
+            life: 3000,
+          });
         });
     }
   };
@@ -308,36 +305,28 @@ const CrudStock = () => {
   };
 
   const quantityBodyTemplate = (rowData) => {
-    if (rowData.quantity > 100) {
-      return <Tag value={rowData.quantity} severity="success"></Tag>;
-    } else if (rowData.quantity > 0 && rowData.quantity < 100) {
-      return <Tag value={rowData.quantity} severity="warning"></Tag>;
-    } else {
-      return <Tag value={rowData.quantity} severity="danger"></Tag>;
-    }
+    return <Typography variant="OVERLINE TEXT">{rowData.quantity}</Typography>;
   };
 
   const statusBodyTemplate = (rowData) => {
     if (rowData.quantity > 100) {
-      return <Tag value="En Stock" icon="pi pi-check" severity="success"></Tag>;
-    } else if (rowData.quantity > 0 && rowData.quantity < 100) {
+      return <Tag value="En Stock" icon="pi pi-check" severity="success" />;
+    }
+    if (rowData.quantity > 0 && rowData.quantity < 100) {
       return (
         <Tag
           value="Stock bas"
           icon="pi pi-exclamation-triangle"
           severity="warning"
-        ></Tag>
-      );
-    } else {
-      return (
-        <Tag value="Stock épuisé" icon="pi pi-times" severity="danger"></Tag>
+        />
       );
     }
+    return <Tag value="Stock épuisé" icon="pi pi-times" severity="danger" />;
   };
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
+      <>
         <Button
           icon="pi pi-pencil"
           style={{ color: '#212830', marginRight: '6px' }}
@@ -352,7 +341,7 @@ const CrudStock = () => {
           severity="danger"
           onClick={() => confirmDeleteStock(rowData)}
         />
-      </React.Fragment>
+      </>
     );
   };
 
@@ -380,7 +369,7 @@ const CrudStock = () => {
           className="mb-4"
           left={leftToolbarTemplate}
           right={rightToolbarTemplate}
-        ></Toolbar>
+        />
         <DataTable
           scrollable
           scrollHeight="50vh"
@@ -397,47 +386,47 @@ const CrudStock = () => {
           globalFilter={globalFilter}
           header={header}
         >
-          <Column selectionMode="multiple" exportable={false}></Column>
+          <Column selectionMode="multiple" exportable={false} />
           <Column
             field="code"
             header="Code"
             body={codeBodyTemplate}
             sortable
             style={{ minWidth: '12rem' }}
-          ></Column>
+          />
           <Column
             field="name"
             header="Libelle"
             body={labelBodyTemplate}
             sortable
             style={{ minWidth: '16rem' }}
-          ></Column>
+          />
           <Column
             field="quantity"
             header="Quantité"
             body={quantityBodyTemplate}
             sortable
             style={{ minWidth: '8rem' }}
-          ></Column>
+          />
           <Column
             field="stockStatus"
             header="Status"
             body={statusBodyTemplate}
             sortable
             style={{ minWidth: '12rem' }}
-          ></Column>
+          />
           <Column
             body={actionBodyTemplate}
             exportable={false}
             style={{ minWidth: '12rem' }}
-          ></Column>
+          />
         </DataTable>
       </div>
 
       {/* Modal details et modif */}
       <Dialog
         visible={stockDialog}
-        style={{ width: '32rem' }}
+        style={{ width: '32rem', zIndex: 9999 }}
         breakpoints={{ '960px': '75vw', '641px': '90vw' }}
         header="Détails du stock"
         modal
@@ -446,7 +435,7 @@ const CrudStock = () => {
       >
         <Formik
           initialValues={{
-            id_franchises: id,
+            id_franchises: user.franchise,
             id_ingredients: stock.id_ingredients,
             quantity: stock.quantity,
           }}
@@ -464,6 +453,7 @@ const CrudStock = () => {
             isSubmitting,
             setFieldValue,
           }) => {
+            console.log(errors);
             return (
               <Form>
                 <TextField
@@ -627,6 +617,6 @@ const CrudStock = () => {
       </Dialog>
     </div>
   );
-};
+}
 
 export default CrudStock;

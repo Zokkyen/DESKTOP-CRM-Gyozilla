@@ -1,21 +1,28 @@
-import RamenDiningIcon from '@mui/icons-material/RamenDining';
+/* eslint-disable import/no-named-as-default */
+/* eslint-disable import/no-named-as-default-member */
+/* eslint-disable import/no-cycle */
 import InventoryIcon from '@mui/icons-material/Inventory';
 import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+import RamenDiningIcon from '@mui/icons-material/RamenDining';
 import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import Profile from './profile/Profile';
 import Home from './home/Home';
-import CrudEmployee from './crudEmployee/CrudEmployee';
 import Ca from './ca/Ca';
 import CrudIngredient from './crudIngredient/CrudIngredient';
 import CrudStock from './crudStock/CrudStock';
+import OrdersPage from './order/Order';
+import Cooking from './order/Cooking';
+import CrudEmployee from './crudEmployee/CrudEmployee';
 
 const arrayNavigation = [
   {
     label: 'Accueil',
     icon: <HomeIcon />,
+    roles: [1, 2, 3, 4],
     component: {
       callback: ({ callback }) => <Home onLinkClick={callback} />,
     },
@@ -23,6 +30,7 @@ const arrayNavigation = [
   {
     label: 'CA',
     icon: <TrendingUpIcon />,
+    roles: [2, 4],
     component: {
       callback: ({ callback }) => <Ca onLinkClick={callback} />,
     },
@@ -30,6 +38,7 @@ const arrayNavigation = [
   {
     label: 'Profil',
     icon: <AccountCircleIcon />,
+    roles: [1, 2, 4],
     component: {
       callback: ({ callback }) => <Profile onLinkClick={callback} />,
     },
@@ -37,6 +46,7 @@ const arrayNavigation = [
   {
     label: 'Produits',
     icon: <RamenDiningIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
     },
@@ -44,6 +54,7 @@ const arrayNavigation = [
   {
     label: 'Ingrédients',
     icon: <InventoryIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudIngredient onLinkClick={callback} />,
     },
@@ -51,6 +62,7 @@ const arrayNavigation = [
   {
     label: 'Employés',
     icon: <PersonIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudEmployee onLinkClick={callback} />,
     },
@@ -58,10 +70,33 @@ const arrayNavigation = [
   {
     label: 'Stock',
     icon: <InventoryIcon />,
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <CrudStock onLinkClick={callback} />,
     },
   },
+  {
+    label: 'Cuisine',
+    icon: <RamenDiningIcon />,
+    roles: [3, 4],
+    component: {
+      callback: ({ callback }) => <Cooking onLinkClick={callback} />,
+    },
+  },
+  {
+    label: 'Commandes',
+    icon: <ChecklistIcon />,
+    roles: [1, 3, 4],
+    component: {
+      callback: ({ callback }) => <OrdersPage onLinkClick={callback} />,
+    },
+  },
 ];
+
+export const getNavigationItemsForRole = (role) => {
+  return arrayNavigation.filter((item) => {
+    return item.roles ? item.roles.includes(role) : false;
+  });
+};
 
 export default arrayNavigation;

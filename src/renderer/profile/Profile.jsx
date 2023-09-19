@@ -72,7 +72,13 @@ export default function Home() {
         enableReinitialize
       >
         {() => (
-          <Form style={{ maxWidth: '500px' }}>
+          <Form
+            style={{
+              maxWidth: '500px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
             <Paper style={{ padding: '2em' }}>
               <Grid container spacing={3} sx={{ position: 'relative' }}>
                 <Grid item xs={12}>
