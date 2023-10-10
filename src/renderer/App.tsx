@@ -1,6 +1,15 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
+import { ThemeProvider, createTheme, useTheme } from '@mui/material';
+
+// const theme = createTheme({
+//   palette: {
+//     primary: {
+//       main: '#212830',
+//     },
+//   },
+// });
 
 function Hello() {
   return (
