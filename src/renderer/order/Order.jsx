@@ -309,8 +309,8 @@ function OrderCard({ order, setOrdersData, toast }) {
             }}
           >
             <Typography>{getOrderStatusLabel(order.id_status)}</Typography>
-            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-              {formattedHour}
+            <Typography sx={{ fontWeight: 'bold', fontSize: '1.3em' }}>
+              le {formattedDate} à {formattedHour}
             </Typography>
             <NotificationsActiveIcon
               sx={{
@@ -431,7 +431,8 @@ function OrdersPage() {
     const fetchOrdersData = async () => {
       try {
         const response = await getAllOrdersByFranchise(user.franchise);
-        setOrdersData(response.data.data);
+        const sortedData = response.data.data.sort((a, b) => a.id - b.id);
+        setOrdersData(sortedData);
       } catch (error) {
         console.error('Erreur lors de la récupération des orders :', error);
       }
