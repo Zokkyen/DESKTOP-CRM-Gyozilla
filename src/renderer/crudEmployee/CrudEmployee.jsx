@@ -1,18 +1,19 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable no-use-before-define */
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { SelectButton } from 'primereact/selectbutton';
-import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
-import { addEmployee } from 'renderer/utils/api-call/addEmployee';
-import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
-import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
-import { Button } from '@mui/material';
-import { TextField, Grid } from '@mui/material';
+import { Button, TextField, Grid } from '@mui/material';
 import { Dialog } from 'primereact/dialog';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteEmployee } from 'renderer/utils/api-call/deleteEmployee';
+import { updateEmployee } from 'renderer/utils/api-call/updateEmployee';
+import { addEmployee } from 'renderer/utils/api-call/addEmployee';
+import { getAllEmployees } from 'renderer/utils/api-call/getAllEmployees';
 
 export default function CrudEmployee() {
   const [employees, setEmployees] = useState([]);
@@ -61,7 +62,7 @@ export default function CrudEmployee() {
   };
 
   // Mise en place du scroll pour le CRUD
-  const ScrollCrud = () => {
+  function ScrollCrud() {
     return (
       <div
         style={{
@@ -94,19 +95,19 @@ export default function CrudEmployee() {
               field="id"
               header="Id"
               style={{ color: 'blue', fontWeight: 'bold' }}
-            ></Column>
-            <Column field="lastname" header="Nom"></Column>
-            <Column field="firstname" header="Prénom"></Column>
+            />
+            <Column field="lastname" header="Nom" />
+            <Column field="firstname" header="Prénom" />
             <Column
               field="id_roles"
               style={{ color: 'green', fontWeight: 'bold' }}
               header="Rôle"
               body={roleTemplate}
-            ></Column>
-            <Column field="email" header="Email"></Column>
-            <Column field="phone" header="Téléphone"></Column>
-            <Column header="Modifier" body={editButtonTemplate}></Column>
-            <Column header="Supprimer" body={deleteButtonTemplate}></Column>
+            />
+            <Column field="email" header="Email" />
+            <Column field="phone" header="Téléphone" />
+            <Column header="Modifier" body={editButtonTemplate} />
+            <Column header="Supprimer" body={deleteButtonTemplate} />
           </DataTable>
         </div>
 
@@ -120,7 +121,7 @@ export default function CrudEmployee() {
         </span>
       </div>
     );
-  };
+  }
   // ------------------------------------------------------
 
   // Fonction pour gérer la création d'un nouvel employé
