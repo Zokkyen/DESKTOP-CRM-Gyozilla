@@ -1,8 +1,9 @@
 import axios from 'axios';
 
+// Création d'une instance Axios
 const instance = axios.create({
-  // baseURL: 'https://api.gyozilla-restaurants.fr/api/',
-  baseURL: 'http://localhost:4000/api/',
+  baseURL: 'https://api.gyozilla-restaurants.fr/api/',
+  // baseURL: 'http://localhost:4000/api/',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
@@ -39,7 +40,6 @@ instance.interceptors.response.use(
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      // console.log(error.response);
       // Déconnexion de l'utilisateur et suppression du token
       localStorage.removeItem('token');
       // window.location.href = '/login'; // rediriger vers la page de connexion

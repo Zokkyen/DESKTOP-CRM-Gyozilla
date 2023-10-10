@@ -35,7 +35,10 @@ export default function Login() {
         }}
       >
         <Formik
-          initialValues={{ email: '', password: '' }}
+          initialValues={{
+            email: 'rabbit.roger@gyozilla-amiens.fr',
+            password: 'ilesttropfort',
+          }}
           validationSchema={Yup.object({
             email: Yup.string()
               .email('Invalid email address')

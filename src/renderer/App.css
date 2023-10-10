@@ -14,7 +14,7 @@ body {
   ); */
   background: white;
   font-family: sans-serif;
-  overflow-y: hidden;
+  overflow-y: scroll;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,11 +32,6 @@ button {
   transition: all ease-in 0.1s;
   cursor: pointer;
   opacity: 0.9;
-}
-
-button:hover {
-  transform: scale(1.05);
-  opacity: 1;
 }
 
 li {
@@ -60,4 +55,12 @@ a:hover {
   justify-content: center;
   align-items: center;
   margin: 20px 0;
+}
+
+body {
+  overflow: auto;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
