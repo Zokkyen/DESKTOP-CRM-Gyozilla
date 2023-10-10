@@ -69,8 +69,7 @@ const StyledMenu = styled((props) => (
 
 export default function HomeDrawer() {
   const { user, logOut } = useContext(UserContext);
-  // const itemsToShow = getNavigationItemsForRole(user.role);
-  const itemsToShow = getNavigationItemsForRole(4);
+  const itemsToShow = getNavigationItemsForRole(user.role);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
