@@ -1,0 +1,41 @@
+.p-datatable .p-sortable-column:focus {
+    box-shadow: inset 0 0 0 0.15rem #00666f97 !important;
+    outline: 0 none !important;
+}
+
+.p-datatable .p-sortable-column.p-highlight {
+    background: #4f717078 !important;
+    color: #EEF2FF !important;
+}
+
+.p-datatable .p-sortable-column.p-highlight .p-sortable-column-icon {
+    color: #EEF2FF !important;
+}
+
+.p-inputtext:enabled:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem #1e8a9479;
+    border-color: #00656f;
+}
+
+.p-inputtext:enabled:hover {
+    border-color: #00656f;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    background: #abe2e772;
+    border-color: #abe2e772;
+    color: #00656f;
+}
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight:focus {
+    background: #abe2e772;
+    border-color: #00656f;
+    color: #00656f;
+}
+
+.p-link:focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem #4f717078;
+}

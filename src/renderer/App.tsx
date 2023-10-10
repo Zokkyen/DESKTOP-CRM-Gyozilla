@@ -1,59 +1,22 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import React from 'react';
+import { MemoryRouter as Router } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 import './App.css';
-import { ThemeProvider, createTheme, useTheme } from '@mui/material';
-
-// const theme = createTheme({
-//   palette: {
-//     primary: {
-//       main: '#212830',
-//     },
-//   },
-// });
-
-function Hello() {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-}
+import defaultTheme from './utils/theming/theme';
+import RouteConfig from '../routes';
+import { UserProvider } from './utils/context/UserContext';
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <UserProvider>
+      <ThemeProvider theme={defaultTheme}>
+        <Router>
+          <RouteConfig />
+        </Router>
+      </ThemeProvider>
+    </UserProvider>
   );
 }
