@@ -8,7 +8,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import RamenDiningIcon from '@mui/icons-material/RamenDining';
-import CrudProducts from 'renderer/crudProducts/CrudProducts';
+// import CrudProducts from 'renderer/crudProducts/CrudProducts';
 import Profile from './profile/Profile';
 import Home from './home/Home';
 import Ca from './ca/Ca';
@@ -30,7 +30,7 @@ const arrayNavigation = [
   {
     label: 'CA',
     icon: <TrendingUpIcon />,
-    roles: [2, 4],
+    roles: [3, 4],
     component: {
       callback: ({ callback }) => <Ca onLinkClick={callback} />,
     },
@@ -43,14 +43,14 @@ const arrayNavigation = [
       callback: ({ callback }) => <Profile onLinkClick={callback} />,
     },
   },
-  {
-    label: 'Produits',
-    icon: <RamenDiningIcon />,
-    roles: [3, 4],
-    component: {
-      callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
-    },
-  },
+  // {
+  //   label: 'Produits',
+  //   icon: <RamenDiningIcon />,
+  //   roles: [3, 4],
+  //   component: {
+  //     callback: ({ callback }) => <CrudProducts onLinkClick={callback} />,
+  //   },
+  // },
   {
     label: 'Ingrédients',
     icon: <InventoryIcon />,
@@ -70,7 +70,7 @@ const arrayNavigation = [
   {
     label: 'Stock',
     icon: <InventoryIcon />,
-    roles: [3, 4],
+    roles: [2, 3, 4],
     component: {
       callback: ({ callback }) => <CrudStock onLinkClick={callback} />,
     },
@@ -78,7 +78,7 @@ const arrayNavigation = [
   {
     label: 'Cuisine',
     icon: <RamenDiningIcon />,
-    roles: [3, 4],
+    roles: [2, 3, 4],
     component: {
       callback: ({ callback }) => <Cooking onLinkClick={callback} />,
     },

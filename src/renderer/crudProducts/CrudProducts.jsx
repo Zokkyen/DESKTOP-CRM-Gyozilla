@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-const CrudProducts = () => {
-  return (
-    <div>CrudProducts</div>
-  )
+function CrudProducts() {
+  return <div>CrudProducts</div>;
 }
 
-export default CrudProducts
+export default CrudProducts;
